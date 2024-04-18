@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Dn2GameGrids",
+	"Description": "Create and traverse square and hex grids. Simple pathfinding included.",
+	"Category": "Gameplay",
+	"CreatedBy": "Dane Nurse",
+	"CreatedByURL": "https://dn2.github.io/",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "https://twitter.com/DaneNurse",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Dn2GameGrids",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
