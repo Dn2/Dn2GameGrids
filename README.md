@@ -20,8 +20,8 @@ An Unreal Engine 4 plug-in for square and hex grids and simple A* pathfinding. A
 
 
 ## Terminology
-- **Cell**: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.
-- **Cell Address** or **`Address`**: the 2D coordinates (e.g 7,11) that represent a position on the grid.
+- ***Cell***: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.
+- ***Cell Address*** or **`Address`**: the 2D coordinates (e.g 7,11) that represent a position on the grid.
 - **Cell Info**: `FCellInfo` Struct that holds the info for the cells on a grid. `UpdateGridAsync()` populates `TArray<FCellInfo> GridArray` with these. You can find `FCellAdress`, `FGameplayTagContainer`, etc held within.
 - **`Cell Tags`**: `FGameplayTagContainer` that holds the `FGameTags` that are associated with a `Cell Info`.
 - **`Grid Extents`**: The extents of the grid. A `FIntPoint`, X being number if rows and Y being number if column.
@@ -29,7 +29,7 @@ An Unreal Engine 4 plug-in for square and hex grids and simple A* pathfinding. A
 - **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
 ## Members
-**bool bAutoGenerate**: If the actor should generate a grid.
+***bool bAutoGenerate***: If the actor should generate a grid.
 **`float` `CellSize`**: Size of cells.
 **`FGameplayTagContainer` `DefaultCellTags`**: If `bAutoGenerate` is true we generate a grid on BeginPlay using these Tags.
 **`TArray<FCellInfo>` `GridArray`**: Array holding our grid.
