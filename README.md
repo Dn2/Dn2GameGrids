@@ -16,7 +16,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 - [ ] Map importing
 
 ## Setup
-1. Install plugin to your project's plugin folder and enable it by going to Edit > Plugins. e.g: `MyProject/Plugins\Dn2GameGrids`
+1. Install plugin to your project's plugin folder and enable it by going to Edit > Plugins. e.g: `MyProject\Plugins\Dn2GameGrids`
 2. Add a BoxGridActor to your level or create a blueprint with BoxGridActor as its parent class.
 3. In the details panel of your placed BoxGridActor  or class defaults panel of your blueprint, under the Grid category, check bAutoGenerate, and set the extents or your grid.
 4. Alternately, you can skip step 3 and use the blueprint node `Update Grid Async` to build your base grid at runtime. `Update Grid Async` overwrites the current grid if there is one.
@@ -38,7 +38,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`UStaticMeshComponent*` `GridMeshComp`**: Mesh component for visuals of the grid and trace collisions for world locations <> grid address conversions.
 **`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging.
 
-## C++ Functions
+## C++ Functions & Blueprint Nodes
 **`AGridActorBase::UpdateGridAsync()`**: Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation.
 
 **`AGridActorBase::GetPathToGoalAsync()`**: Try to find a path to the goal given addresses and optional filters, using an AStar pathfinding algorithm. On completion calls C++ event `ABoxGridActor::OnAStarSearchEnd_Internal` and blueprint event `ABoxGridActor::OnAStarSearchEnd` with the results of the search.
@@ -60,7 +60,3 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`AGridActorBase::GetCellNeighborsFromAddress()`**: Given an address, an array of neighbouring cells are returned. Optionally filtered using GameplayTags. ToDo: add FCellInfo array parameter instead of targeting AGridActorBase::GridArray & maybe return addresses instead of cell infos.
 
 **`AGridActorBase::GetGridExtents()`**: Returns the extents of the grid.
-
-
-
-## Blueprint Nodes
