@@ -116,7 +116,7 @@ void ABoxGridActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 			MeshScale.Z = GetActorLocation().Z;
 
 			GridMeshComp->SetWorldLocation(MeshScale);
-			UE_LOG(LogTemp, Warning, TEXT("Property changed: %s"), *e.GetPropertyName().ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("Property changed: %s"), *e.GetPropertyName().ToString());
 
 
 			if (!GridMatInst && GridMat)
@@ -421,7 +421,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 
 		// Generate children
 		//let the children of the currentNode equal the adjacent nodes
-		TArray<FCellInfo> ChildrenNodes = GetCellNeighborsFromAddress(CurrentNode.Address, InFilters, ExFilters, bCorners);
+		TArray<FCellInfo> ChildrenNodes = GetCellNeighbors(CurrentNode.Address, InFilters, ExFilters, bCorners);
 
 		for (FCellInfo cell : ChildrenNodes)
 		{
@@ -458,7 +458,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 	return FAStarSearchResults();
 }
 
-TArray<FCellInfo> ABoxGridActor::GetCellNeighborsFromAddress(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners /*= true*/) const
+TArray<FCellInfo> ABoxGridActor::GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners /*= true*/) const
 {
 	TArray<FCellInfo> Neighbours;
 	FCellAddress CellAddress;

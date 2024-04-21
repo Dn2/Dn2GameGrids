@@ -1,9 +1,9 @@
 # Dn2GameGrid
 
-An Unreal Engine 4 plug-in for square and hex grids and simple A* pathfinding. An instance of a grid is managed by an Actor that holds an array of the cells (points/nodes) on the grid. There are helper functions in both C++ and Blueprints for you to manipulate the grid, it's cells and your gameplay actors.
+Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding. An instance of a grid is managed by an Actor that holds an array of the cells (points/nodes) on the grid. There are helper functions in both C++ and Blueprints for you to manipulate the grid, it's cells and your gameplay actors.
 
 ## Features
-- [x] Async grid population
+- [x] Async grid generation
 - [x] Async A* pathfinding
 - [x] Non iterative cell validation
 - [x] World Location <-> Grid coordinates conversion
@@ -12,12 +12,14 @@ An Unreal Engine 4 plug-in for square and hex grids and simple A* pathfinding. A
 ## Not Implemented (Yet)
 - [ ] Hexagon version
 - [ ] Common helper cell selection operations (think trace and overlap but for cells, sorta)
-- [ ] WFC base class
+- [ ] WFC (Wave Function Collapse) base class
+- [ ] Map importing
 
 ## Setup
-
-
-
+1. Install plugin to your project's plugin folder and enable it by going to Edit > Plugins. e.g: `MyProject/Plugins\Dn2GameGrids`
+2. Add a BoxGridActor to your level or create a blueprint with BoxGridActor as its parent class.
+3. In the details panel of your placed BoxGridActor  or class defaults panel of your blueprint, under the Grid category, check bAutoGenerate, and set the extents or your grid.
+4. Alternately, you can skip step 3 and use the blueprint node `Update Grid Async` to build your base grid at runtime. `Update Grid Async` overwrites the current grid if there is one.
 
 ## Terminology
 - **`Cell`**: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.

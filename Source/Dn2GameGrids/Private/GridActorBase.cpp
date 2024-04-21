@@ -121,17 +121,32 @@ FCellInfo AGridActorBase::GetCellInfoByAddress(FCellAddress Address) const
 	return FCellInfo();
 }
 
+TArray<FCellInfo> AGridActorBase::GetCellInfosByAddresses(TArray<FCellAddress> Addresses) const
+{
+	TArray<FCellInfo> CellResults;
+
+	for (FCellAddress AddressItem : Addresses)
+	{
+		if (DoesCellExist(AddressItem))
+		{
+			CellResults.Add(GetCellInfoByAddress(AddressItem));
+		}
+	}
+
+	return CellResults;
+}
+
 FAStarSearchResults AGridActorBase::AStarSearchToGoal(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners)
 {
 	return FAStarSearchResults();
 }
 
-TArray<FCellInfo> AGridActorBase::GetCellNeighborsFromAddress(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners /*= true*/) const
+TArray<FCellInfo> AGridActorBase::GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners /*= true*/) const
 {
 	return TArray<FCellInfo>();
 }
 
-TArray<FCellInfo> AGridActorBase::GetWalkableCellsFromArray(TArray<FCellInfo> InCellArray) const
+TArray<FCellInfo> AGridActorBase::GetWalkableCells(TArray<FCellInfo> InCellArray) const
 {
 	return TArray<FCellInfo>();
 }

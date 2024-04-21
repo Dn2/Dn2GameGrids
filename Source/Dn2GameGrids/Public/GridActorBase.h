@@ -100,7 +100,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location);
 
-	//Convert Address to Index
+	//Convert Address to Index, where a cell should be in and array of cells
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	virtual int32 GetIndexFromAddress(FCellAddress Address) const;
 
@@ -116,7 +116,7 @@ public:
 	*	check or something that isn't mapped to a cell address.
 	*	(i.e. you do an overlap check at a cells location taking CellSize into account etc)
 	* 
-	*	Cheap but assumes cells index in array. Check address before using.
+	*	Check address before using functions that have bool return types
 	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	virtual bool IsCellBlocked(FCellAddress Address) const;
@@ -127,6 +127,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FCellInfo GetCellInfoByAddress(FCellAddress Address) const;
 
+	/* Calls GetCellInfoByAddress for each item in array and returns the resulting array */
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	virtual TArray<FCellInfo> GetCellInfosByAddresses(TArray<FCellAddress> Addresses) const;
+
 	/*
 	*	A* (star) Pathfinding
 	*	https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
@@ -135,10 +139,15 @@ public:
 	virtual FAStarSearchResults AStarSearchToGoal(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	virtual TArray<FCellInfo> GetCellNeighborsFromAddress(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
+	virtual TArray<FCellInfo> GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
+
+	/* You can specify a target array unlike the above that targets TArray<FCellInfo> GridArray */
+	//UFUNCTION(BlueprintCallable, Category = Grid)
+	//virtual TArray<FCellInfo> GetCellNeighborsExternal(TArray<FCellInfo> CellArray, FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
+
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	virtual TArray<FCellInfo> GetWalkableCellsFromArray(TArray<FCellInfo> InCellArray) const;
+	virtual TArray<FCellInfo> GetWalkableCells(TArray<FCellInfo> InCellArray) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	FIntPoint GetGridExtents() const;
@@ -203,8 +212,5 @@ public:
 	*/
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
-
-
-
 
 };

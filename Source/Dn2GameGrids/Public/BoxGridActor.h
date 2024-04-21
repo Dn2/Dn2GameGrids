@@ -58,7 +58,7 @@ public:
 
 	virtual FAStarSearchResults AStarSearchToGoal(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners) override;
 
-	virtual TArray<FCellInfo> GetCellNeighborsFromAddress(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
+	virtual TArray<FCellInfo> GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
 
 
 
