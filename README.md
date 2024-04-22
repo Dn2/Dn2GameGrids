@@ -77,7 +77,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 | **DoesCellExist** | Yes | Yes | Returns `true` if the given address is valid and the `FCellInfo` in the assumed index of `AGridActorBase::GridArray` matches |
 | **GetCellInfoByAddress** | Yes | Yes | Given and address returns the associated `FCellInfo` from `AGridActorBase::GridArray`. Make sure the returned `FCellInfo::Address` is valid. i.e. not `FCellAddress(-1,-1)` |
 | **GetCellNeighbors** | Yes | Yes | Given an address, an array of neighbouring cells are returned. Optionally filtered using GameplayTags. ToDo: maybe return addresses instead of cell infos |
-| **AGridActorBase::GetGridExtents** | Yes | Yes | Returns the extents of the grid. |
+| **GetGridExtents** | Yes | Yes | Returns the extents of the grid. |
 
 
 <!--
