@@ -30,7 +30,8 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 - **`Neighbors`**: Any cells directly next to a given cell. e.g. `GetCellNeighborsFromAddress()` returns cells next to a given cell.
 - **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
-## Members <!--
+## Members
+<!--
 **`bool` `bAutoGenerate`**: If the actor should generate a grid.
 **`float` `CellSize`**: Size of cells.
 **`FGameplayTagContainer` `DefaultCellTags`**: If `bAutoGenerate` is true we generate a grid on BeginPlay using these Tags.
