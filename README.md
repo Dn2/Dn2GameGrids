@@ -38,6 +38,13 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`UStaticMeshComponent*` `GridMeshComp`**: Mesh component for visuals of the grid and trace collisions for world locations <> grid address conversions.
 **`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging.
 
+| Type                        | Name                  | Description                                                           |
+|-----------------------------|-----------------------|-----------------------------------------------------------------------|
+| **`bool`**                  | **`bAutoGenerate`**   | Show a grid preview in editor & generate on BeginPlay                 |
+| **`float`**                 | **`CellSize`**        | Size of cells                                                         |
+| **`FGameplayTagContainer`** | **`DefaultCellTags`** | If **`bAutoGenerate`**, generate a grid on BeginPlay using these Tags |
+| **`TArray<FCellInfo>`**     | **`GridArray`**       | Array holding our grid cells                                          |
+
 ## C++ Functions & Blueprint Nodes
 **`AGridActorBase::UpdateGridAsync()`**: Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation.
 
