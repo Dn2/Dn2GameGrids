@@ -20,6 +20,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 2. Add a BoxGridActor to your level or create a blueprint with BoxGridActor as its parent class.
 3. In the details panel of your placed BoxGridActor  or class defaults panel of your blueprint, under the Grid category, check bAutoGenerate, and set the extents or your grid.
 4. Alternately, you can skip step 3 and use the blueprint node `Update Grid Async` to build your base grid at runtime. `Update Grid Async` overwrites the current grid if there is one.
+5. Additionally `Update Grid Async`, on completion fires off Blueprint and C++ events with the resulting grid array, grid extents and cell size.
 
 ## Terminology
 - **`Cell`**: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.
@@ -32,7 +33,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 
 - **`Grid Extents`**: The extents of the grid. A `FIntPoint`, X being number if rows and Y being number if column.
 
-- **`Neighbors`**: Any cells directly next to a given cell. e.g. `GetCellNeighborsFromAddress()` returns cells next to a given cell.
+- **`Neighbors`**: Any cells directly next to a given cell. e.g. `GetCellNeighbors()` returns cells next to a given cell.
 
 - **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
@@ -66,9 +67,20 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 ## AGridActorBase C++ Functions & Blueprint Nodes
 | Name | CPP | BP | Description |
 |-|-|-|-|
-| **UpdateGridAsync()** | Yes | Yes | Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation. |
-| **GetPathToGoalAsync()** | Yes | Yes |Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation|
+| **UpdateGridAsync** | Yes | Yes | Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation. |
+| **GetPathToGoalAsync** | Yes | Yes |Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation|
+| **CreateEmptyGrid** | Yes | Yes | Create a grid array that you can do what you want with. Not Async. No sort of setups of anything. Just an array of `FCellInfo` |
+| **AStarSearchToGoal** | Yes | Yes | Not Async. Try to find a path to the goal given addresses and optional filters, using an AStar pathfinding algorithm |
+| **GetCellLocationFromAddress**| Yes | Yes | Given the address of a cell (e.g 12,24) return the cell's world location. Uses the Actor's GridArray |
+| **GetCellAddressFromLocation** | Yes | Yes | Given a world location (e.g `FVector(123,456,10)`) return a cell address IF the address is valid. Return value of `FCellAddress(-1,-1)` means there is no cell associated with given location. Uses the Actor's GridArray |
+| **GetIndexFromAddress** | Yes | Yes | Given the address of a cell, return the Index for that cell's `FCellInfo` in `AGridActorBase::GridArray`. Avoids iterating arrays by just calculation its index |
+| **DoesCellExist** | Yes | Yes | Returns `true` if the given address is valid and the `FCellInfo` in the assumed index of `AGridActorBase::GridArray` matches |
+| **GetCellInfoByAddress** | Yes | Yes | Given and address returns the associated `FCellInfo` from `AGridActorBase::GridArray`. Make sure the returned `FCellInfo::Address` is valid. i.e. not `FCellAddress(-1,-1)` |
+| **GetCellNeighbors** | Yes | Yes | Given an address, an array of neighbouring cells are returned. Optionally filtered using GameplayTags. ToDo: maybe return addresses instead of cell infos |
+| **AGridActorBase::GetGridExtents** | Yes | Yes | Returns the extents of the grid. |
 
+
+<!--
 **`AGridActorBase::UpdateGridAsync()`**: Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation.
 
 **`AGridActorBase::GetPathToGoalAsync()`**: Try to find a path to the goal given addresses and optional filters, using an AStar pathfinding algorithm. On completion calls C++ event `ABoxGridActor::OnAStarSearchEnd_Internal` and blueprint event `ABoxGridActor::OnAStarSearchEnd` with the results of the search.
@@ -87,6 +99,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 
 **`AGridActorBase::GetCellInfoByAddress()`**: Given and address returns the associated `FCellInfo` from `AGridActorBase::GridArray`. Make sure the returned `FCellInfo::Address` is valid. i.e. not `FCellAddress(-1,-1)`
 
-**`AGridActorBase::GetCellNeighborsFromAddress()`**: Given an address, an array of neighbouring cells are returned. Optionally filtered using GameplayTags. ToDo: add FCellInfo array parameter instead of targeting AGridActorBase::GridArray & maybe return addresses instead of cell infos.
+**`AGridActorBase::GetCellNeighbors()`**: Given an address, an array of neighbouring cells are returned. Optionally filtered using GameplayTags. ToDo: add FCellInfo array parameter instead of targeting AGridActorBase::GridArray & maybe return addresses instead of cell infos.
 
 **`AGridActorBase::GetGridExtents()`**: Returns the extents of the grid.
+-->
