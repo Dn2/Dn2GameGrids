@@ -30,20 +30,22 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 - **`Neighbors`**: Any cells directly next to a given cell. e.g. `GetCellNeighborsFromAddress()` returns cells next to a given cell.
 - **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
-## Members
+## Members <!--
 **`bool` `bAutoGenerate`**: If the actor should generate a grid.
 **`float` `CellSize`**: Size of cells.
 **`FGameplayTagContainer` `DefaultCellTags`**: If `bAutoGenerate` is true we generate a grid on BeginPlay using these Tags.
 **`TArray<FCellInfo>` `GridArray`**: Array holding our grid.
 **`UStaticMeshComponent*` `GridMeshComp`**: Mesh component for visuals of the grid and trace collisions for world locations <> grid address conversions.
-**`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging.
+**`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging. -->
 
-| Type                        | Name                  | Description                                                           |
-|-----------------------------|-----------------------|-----------------------------------------------------------------------|
-| **`bool`**                  | **`bAutoGenerate`**   | Show a grid preview in editor & generate on BeginPlay                 |
-| **`float`**                 | **`CellSize`**        | Size of cells                                                         |
-| **`FGameplayTagContainer`** | **`DefaultCellTags`** | If **`bAutoGenerate`**, generate a grid on BeginPlay using these Tags |
-| **`TArray<FCellInfo>`**     | **`GridArray`**       | Array holding our grid cells                                          |
+| Type                        | Name                  | Description                                                                              |
+|-----------------------------|-----------------------|------------------------------------------------------------------------------------------|
+| **`bool`**                  | **`bAutoGenerate`**   | Show a grid preview in editor & generate on BeginPlay                                    |
+| **`float`**                 | **`CellSize`**        | Size of cells                                                                            |
+| **`FGameplayTagContainer`** | **`DefaultCellTags`** | If **`bAutoGenerate`**, generate a grid on BeginPlay using these Tags                    |
+| **`TArray<FCellInfo>`**     | **`GridArray`**       | Array holding our grid cells                                                             |
+| **`UStaticMeshComponent*`** | **`GridMeshComp`**    | Visual of the grid and trace collisions for world locations <-> grid address conversions |
+| **`UMaterial*`**            | **`GridMat`**         | The material we'll make and instance of and use for visual debugging                     |
 
 ## C++ Functions & Blueprint Nodes
 **`AGridActorBase::UpdateGridAsync()`**: Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation.
