@@ -53,7 +53,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`TArray<FCellInfo>` `GridArray`**: Array holding our grid.
 **`UStaticMeshComponent*` `GridMeshComp`**: Mesh component for visuals of the grid and trace collisions for world locations <> grid address conversions.
 **`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging. -->
-| Type                        | Name                  | Description                                                                              |
+| Name                        | Type                  | Description                                                                              |
 |-----------------------------|-----------------------|------------------------------------------------------------------------------------------|
 | **`bAutoGenerate`** | **bool** | Show a grid preview in editor & generate on BeginPlay |
 | **CellSize** | **`float`** | Size of cells |
@@ -64,7 +64,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 
 
 ## AGridActorBase C++ Functions & Blueprint Nodes
-| Name | C++ | BP | Description |
+| Name | CPP | BP | Description |
 |-|-|-|-|
 | **UpdateGridAsync()** | Yes | Yes | Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation. |
 | **GetPathToGoalAsync()** | Yes | Yes |Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation|
