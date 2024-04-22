@@ -1,6 +1,6 @@
 # Dn2GameGrid
 
-Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding. An instance of a grid is managed by an Actor that holds an array of the cells (points/nodes) on the grid. There are helper functions in both C++ and Blueprints for you to manipulate the grid, it's cells and your gameplay actors.
+Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding. An instance of a grid is managed by an Actor that holds an array of the cells (points/nodes) on the grid. There are helper functions in both C++ and Blueprints for you to manipulate the grid, it's cells and your gameplay actors. Made and tested in Unreal Engine 4.27.
 
 ## Features
 - [x] Async grid generation
@@ -23,19 +23,19 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 5. Additionally `Update Grid Async`, on completion fires off Blueprint and C++ events with the resulting grid array, grid extents and cell size.
 
 ## Terminology
-- **`Cell`**: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.
+- **Cell**: A point or node on the grid with associated 2D coordinates (e.g 4,20). See `Cell Info`.
 
-- **`Cell Address`** or **`Address`**: the 2D coordinates (e.g 7,11) that represent a position on the grid.
+- **Cell Address** or **Address**: the 2D coordinates (e.g 7,11) that represent a position on the grid.
 
-- **`Cell Info`**: `FCellInfo` Struct that holds the info for the cells on a grid. `UpdateGridAsync()` populates `TArray<FCellInfo> GridArray` with these. You can find `FCellAdress`, `FGameplayTagContainer`, etc held within.
+- **Cell Info**: `FCellInfo` Struct that holds the info for the cells on a grid. `UpdateGridAsync()` populates `TArray<FCellInfo> GridArray` with these. You can find `FCellAdress`, `FGameplayTagContainer`, etc held within.
 
-- **`Cell Tags`**: `FGameplayTagContainer` that holds the `FGameTags` that are associated with a `Cell Info`.
+- **Cell Tags**: `FGameplayTagContainer` that holds the `FGameTags` that are associated with a `Cell Info`.
 
-- **`Grid Extents`**: The extents of the grid. A `FIntPoint`, X being number if rows and Y being number if column.
+- **Grid Extents**: The extents of the grid. A `FIntPoint`, X being number if rows and Y being number if column.
 
-- **`Neighbors`**: Any cells directly next to a given cell. e.g. `GetCellNeighbors()` returns cells next to a given cell.
+- **Neighbors**: Any cells directly next to a given cell. e.g. `GetCellNeighbors()` returns cells next to a given cell.
 
-- **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
+- **Cell Size**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
 ## Types
 | Name | Members | Description |
