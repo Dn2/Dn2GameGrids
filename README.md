@@ -36,7 +36,16 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 
 - **`Cell Size`**: The size of a cell when calculating its dimensions & location in world space in relation to the `AGridActorBase` that owns it.
 
-## Members
+## Types
+| Name | Members | Description |
+|-|-|-|
+| FCellAddress | `int32 Row` `in32 Col` | Coordinates for a cell, Row and Column|
+| FCellInfo | `FCellAddress Address` `FGameplayTagContainer CellTags`| Used for grid array. Holds info for each cell in the grid array |
+| FAStarCellInfo | `float H` `float G` `float F` `FCellAddress Address` `FCellAddress CameFrom` | Used for the A-Star algo |
+| FAStarSearchResults | `bool bFoundGoal` `TArray<FCellAddress> Path` | Struct holding the results of AStar search algorithm |
+
+
+## AGridActorBase Members
 <!--
 **`bool` `bAutoGenerate`**: If the actor should generate a grid.
 **`float` `CellSize`**: Size of cells.
@@ -44,25 +53,22 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`TArray<FCellInfo>` `GridArray`**: Array holding our grid.
 **`UStaticMeshComponent*` `GridMeshComp`**: Mesh component for visuals of the grid and trace collisions for world locations <> grid address conversions.
 **`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging. -->
-
 | Type                        | Name                  | Description                                                                              |
 |-----------------------------|-----------------------|------------------------------------------------------------------------------------------|
-| **bool**                  | **`bAutoGenerate`**   | Show a grid preview in editor & generate on BeginPlay                                    |
-| **`float`**                 | **CellSize**        | Size of cells                                                                            |
-| **FGameplayTagContainer** | **DefaultCellTags** | If `bAutoGenerate`, generate a grid on BeginPlay using these Tags                    |
-| **`TArray<FCellInfo>`**     | **`GridArray`**       | Array holding our grid cells                                                             |
-| **`UStaticMeshComponent*`** | **`GridMeshComp`**    | Visual of the grid and trace collisions for world locations <-> grid address conversions |
-| **`UMaterial*`**            | **`GridMat`**         | The material we'll make and instance of and use for visual debugging                     |
+| **`bAutoGenerate`** | **bool** | Show a grid preview in editor & generate on BeginPlay |
+| **CellSize** | **`float`** | Size of cells |
+| **DefaultCellTags** | **FGameplayTagContainer** | If `bAutoGenerate`, generate a grid on BeginPlay using these Tags |
+| **`GridArray`** | **`TArray<FCellInfo>`** | Array holding our grid cells |
+| **`GridMeshComp`** | **`UStaticMeshComponent*`** | Visual of the grid and trace collisions for world locations <-> grid address conversions |
+| **`GridMat`** | **`UMaterial*`** | The material we'll make and instance of and use for visual debugging |
 
 
-
+## AGridActorBase C++ Functions & Blueprint Nodes
 | Name | C++ | BP | Description |
 |-|-|-|-|
 | **UpdateGridAsync()** | Yes | Yes | Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation. |
 | **GetPathToGoalAsync()** | Yes | Yes |Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation|
 
-
-## C++ Functions & Blueprint Nodes
 **`AGridActorBase::UpdateGridAsync()`**: Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation.
 
 **`AGridActorBase::GetPathToGoalAsync()`**: Try to find a path to the goal given addresses and optional filters, using an AStar pathfinding algorithm. On completion calls C++ event `ABoxGridActor::OnAStarSearchEnd_Internal` and blueprint event `ABoxGridActor::OnAStarSearchEnd` with the results of the search.
