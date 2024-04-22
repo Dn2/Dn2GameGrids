@@ -56,12 +56,12 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 **`UMaterial*` `GridMat`**:	The material we'll make and instance of and use for visual debugging. -->
 | Name                        | Type                  | Description                                                                              |
 |-----------------------------|-----------------------|------------------------------------------------------------------------------------------|
-| **`bAutoGenerate`** | **bool** | Show a grid preview in editor & generate on BeginPlay |
+| **bAutoGenerate** | **`bool`** | Show a grid preview in editor & generate on BeginPlay |
 | **CellSize** | **`float`** | Size of cells |
-| **DefaultCellTags** | **FGameplayTagContainer** | If `bAutoGenerate`, generate a grid on BeginPlay using these Tags |
-| **`GridArray`** | **`TArray<FCellInfo>`** | Array holding our grid cells |
-| **`GridMeshComp`** | **`UStaticMeshComponent*`** | Visual of the grid and trace collisions for world locations <-> grid address conversions |
-| **`GridMat`** | **`UMaterial*`** | The material we'll make and instance of and use for visual debugging |
+| **DefaultCellTags** | **`FGameplayTagContainer`** | If `bAutoGenerate`, generate a grid on BeginPlay using these Tags |
+| **GridArray** | **`TArray<FCellInfo>`** | Array holding our grid cells |
+| **GridMeshComp** | **`UStaticMeshComponent*`** | Visual of the grid and trace collisions for world locations <-> grid address conversions |
+| **GridMat** | **`UMaterial*`** | The material we'll make and instance of and use for visual debugging |
 
 
 ## AGridActorBase C++ Functions & Blueprint Nodes
