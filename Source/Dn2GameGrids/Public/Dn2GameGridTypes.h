@@ -14,7 +14,7 @@ enum class EGridMeshAlignment : uint8
 
 
 /**
- * A int32 vector in 2D space composed of components (Row, Col) for cell addresses.
+ * A int32 vector in 2D space composed of components (X, Y) for cell addresses.
  *
  * @return A string describing the vector.
  */
@@ -27,53 +27,61 @@ public:
 	/** Default constructor (no initialization). */
 	FORCEINLINE FCellAddress();
 	FORCEINLINE FCellAddress(FIntPoint InAddress);
-	FORCEINLINE FCellAddress(int32 InRow, int32 InCol);
+	FORCEINLINE FCellAddress(int32 InX, int32 InY);
 
 	bool operator==(const FCellAddress& OtherAddress) const
 	{
-		return OtherAddress.Row == Row && OtherAddress.Col == Col;
+		return OtherAddress.X == X && OtherAddress.Y == Y;
 	}
 
 	bool operator==(const FIntPoint& IntPoint) const
 	{
-		return IntPoint.X == Row && IntPoint.Y == Col;
+		return IntPoint.X == X && IntPoint.Y == Y;
 	}
 
 	bool operator!=(const FCellAddress& OtherAddress) const
 	{
-		return OtherAddress.Row != Row || OtherAddress.Col != Col;
+		return OtherAddress.X != X || OtherAddress.Y != Y;
 	}
 
 	bool operator!=(const FIntPoint& IntPoint) const
 	{
-		return IntPoint.X != Row || IntPoint.Y != Col;
+		return IntPoint.X != X || IntPoint.Y != Y;
 	}
 
 	friend uint32 GetTypeHash(const FCellAddress& Other)
 	{
-		return HashCombine(GetTypeHash(Other.Row), GetTypeHash(Other.Col));
+		return HashCombine(GetTypeHash(Other.X), GetTypeHash(Other.Y));
 	}
 
 	FORCEINLINE FString ToString() const
 	{
-		return FString::Printf(TEXT("Row:%d Col:%d"), Row, Col);
+		return FString::Printf(TEXT("X:%d Y:%d"), X, Y);
 	}
 
 	/* Row or X coordinate for a grid cell on our grid. 0 indexed */
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//int32 Row;
+
+	/* Column or Y coordinate for a grid cell on our grid. 0 indexed */
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//int32 Col;
+
+	/* Row or X coordinate for a grid cell on our grid. 0 indexed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Row;
+	int32 X;
 
 	/* Column or Y coordinate for a grid cell on our grid. 0 indexed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Col;
+	int32 Y;
 };
 FORCEINLINE FCellAddress::FCellAddress()
 {}
 FORCEINLINE FCellAddress::FCellAddress(FIntPoint InAddress)
-	: Row(InAddress.X), Col(InAddress.Y)
+	: X(InAddress.X), Y(InAddress.Y)
 {}
-FORCEINLINE FCellAddress::FCellAddress(int32 InRow, int32 InCol)
-	: Row(InRow), Col(InCol)
+FORCEINLINE FCellAddress::FCellAddress(int32 InX, int32 InY)
+	: X(InX), Y(InY)
 {}
 
 
@@ -97,6 +105,30 @@ public:
 	bool operator==(const FCellInfo& OtherInfo) const
 	{
 		return OtherInfo.Address == Address;
+	}
+
+	/******
+		Unsafe to assume these are valid addressed. First Check with DoesCellExist() before using returned.
+		Idea: add and require a grid extents var in this struct to clamp GetNorth() etc within bounds
+	*/
+	FCellAddress GetNorth(const FCellInfo& OtherInfo)
+	{
+		return FCellAddress(Address.X, Address.Y + 1);
+	}
+
+	FCellAddress GetSouth(const FCellInfo& OtherInfo)
+	{
+		return FCellAddress(Address.X, Address.Y - 1);
+	}
+
+	FCellAddress GetEast(const FCellInfo& OtherInfo)
+	{
+		return FCellAddress(Address.X + 1, Address.Y);
+	}
+
+	FCellAddress GetWest(const FCellInfo& OtherInfo)
+	{
+		return FCellAddress(Address.X - 1, Address.Y);
 	}
 
 	void SetBlocked(const bool Blocked)
@@ -130,13 +162,18 @@ public:
 	}
 
 	/*
-	*	Any negative values in a cell address's Row or Col indicates a value was not assigned.
+	*	Any negative values in a cell address's X or Y indicates a value was not assigned.
 	* 
 	*	Make sure to assign valid, non negative values and check a FCellAddress using DoesCellExist()
 	*	before using them.
 	*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
 	FCellAddress Address = FCellAddress(-1, -1);
+
+
+	//UPROPERTY(BlueprintReadWrite, Category = "Cell Info")
+	//FIntPoint OwnerExtent;
+
 
 	/*
 		This is now unused, replaced by FGameplayTagContainer include & exclude filters that check against CellTags.
@@ -196,12 +233,12 @@ public:
 
 	bool operator==(const FIntPoint& IntPoint) const
 	{
-		return IntPoint.X == Address.Row && IntPoint.Y == Address.Col;
+		return IntPoint.X == Address.X && IntPoint.Y == Address.Y;
 	}
 
 	friend uint32 GetTypeHash(const FAStarCellInfo& Other)
 	{
-		return HashCombine(GetTypeHash(Other.Address.Row), GetTypeHash(Other.Address.Col));
+		return HashCombine(GetTypeHash(Other.Address.X), GetTypeHash(Other.Address.Y));
 	}
 
 	//Heuristic, estimated distance from this cell to target

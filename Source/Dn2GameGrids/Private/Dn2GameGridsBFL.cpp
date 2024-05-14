@@ -5,7 +5,7 @@
 
 /**/FString UDn2GameGridsBFL::Conv_FCellAddressToString(FCellAddress Struct)
 {
-	//return  "Row:" + FString::FromInt(Struct.Row) + " | Col:" + FString::FromInt(Struct.Col);
+	//return  "Row:" + FString::FromInt(Struct.X) + " | Col:" + FString::FromInt(Struct.Y);
 	return Struct.ToString();
 }
 

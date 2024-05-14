@@ -158,6 +158,10 @@ public:
 	*/
 	void SetGridExtents(FIntPoint Extents);
 
+
+	virtual void ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName> CellDictionary);
+
+
 	UPROPERTY()
 	USceneComponent* SceneComp;
 
@@ -213,4 +217,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
 
+
+	//Wave function collapse stuff
+	UFUNCTION(BlueprintCallable, Category = "GridGame|WFC")
+	TArray<FColor> ImageToFColorArray(UTexture2D* Texture, int32 TestIndex);
 };

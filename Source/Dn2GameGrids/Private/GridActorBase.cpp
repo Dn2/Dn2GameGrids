@@ -110,7 +110,8 @@ void AGridActorBase::SetCellBlocked(FCellAddress Address, bool bBlocked)
 {
 	if (DoesCellExist(Address))
 	{
-		int32 Index = (GetGridExtents().Y * Address.Row) + Address.Col;
+		//TODO: change to match refactor
+		int32 Index = Address.Y * GetGridExtents().Y + Address.X;
 		GridArray[Index].SetBlocked(bBlocked);
 	}
 }
@@ -171,4 +172,56 @@ void AGridActorBase::SetGridExtents(FIntPoint Extents)
 	GridExtents = Extents;
 }
 
+
+void AGridActorBase::ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName> CellDictionary)
+{
+
+}
+
+TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 TestIndex)
+{
+	TArray<FColor> PixelData;
+
+	//if invalid return empty array
+	if (!Texture)
+	{
+		return PixelData;
+	}
+
+	/* The pixel data in the resulting array is not in the same order as our cell array. so first we reorder them */
+	FColor* FormattedImageData = reinterpret_cast<FColor*>(Texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_ONLY));
+
+	/* First we need the pixel count and the image's w & h */
+	int32 PixelCount = Texture->GetSizeX() * Texture->GetSizeY();
+	int32 W = Texture->GetSizeX();
+	int32 H = Texture->GetSizeY();
+	int32 Row = 0;
+	int32 Col = 0;
+
+	/* Reorder pixel data to align with our grid system */
+	while (Row < H)
+	{
+		++Row;
+		int32 StartIndex = PixelCount - (Row * W);
+
+		while (Col < W)
+		{
+			
+			PixelData.Add(FormattedImageData[StartIndex + Col]);
+			++Col;
+		}
+
+		Col = 0;
+	}
+
+	/* debug. checking if order is correct 
+	for (FColor colour : PixelData)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, colour, FString::Printf(TEXT("Color: %s"), *colour.ToString()));
+	}*/
+
+	Texture->PlatformData->Mips[0].BulkData.Unlock();
+
+	return PixelData;
+}
 

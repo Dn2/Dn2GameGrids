@@ -38,7 +38,7 @@ ABoxGridActor::ABoxGridActor() : Super()
 		GridMeshComp->SetWorldScale3D(MeshScale);
 
 		MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-		MeshScale.Y = ((GetGridExtents().Y * CellSize) * 0.5f) + GetActorLocation().Y;
+		MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
 		MeshScale.Z = GetActorLocation().Z;
 
 		GridMeshComp->SetWorldLocation(MeshScale);
@@ -107,12 +107,10 @@ void ABoxGridActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 			MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
 			MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
 			MeshScale.Z = 1;
-			GridMeshComp->SetRelativeScale3D(MeshScale);
-			
-
+			GridMeshComp->SetWorldScale3D(MeshScale);
 
 			MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-			MeshScale.Y = ((GetGridExtents().Y * CellSize) * 0.5f) + GetActorLocation().Y;
+			MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
 			MeshScale.Z = GetActorLocation().Z;
 
 			GridMeshComp->SetWorldLocation(MeshScale);
@@ -182,13 +180,30 @@ TArray<FCellInfo> ABoxGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 		return NewGridArray;
 	}
 
+
 	/*
 	*	Zeroed out indexes for the cell creation loop.
 	*	X = rows, Y = columns, Index = the index of the cell in the cell array (CellArray).
 	*/
 	int32 X = 0;
 	int32 Y = 0;
-	int32 Index = 0;
+	//int32 Index = 0;
+
+	while (Y < YExtent+1)
+	{
+
+		while (X < XExtent+1)
+		{
+			NewGridArray.Add(FCellInfo(FCellAddress(X, Y)));
+			NewGridArray.Last().CellTags.AppendTags(DefaultTags);
+
+			++X;
+		}
+
+		X = 0;
+		Y++;
+	}
+
 
 	/*
 	*	Creating our grid...
@@ -197,30 +212,7 @@ TArray<FCellInfo> ABoxGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 	*	keep adding cells with the appropriate addresses.
 	*	Ends when we run out of rows.
 	*/
-
-	while (X < XExtent)
-	{
-		// Create a cell info with current address, location and index.
-		NewGridArray.Add(FCellInfo(FIntPoint(X, Y)));
-
-		//Add our default tags
-		NewGridArray.Last().CellTags.AppendTags(DefaultTags);
-		// Increment the index for the next cell.
-		++Index;
-
-		// If we reach the end of GridExtent.X we reset X to 0 and increment Y,
-		// moving us onto the next row of cells to start again
-		if (Y == YExtent - 1)
-		{
-			Y = 0;
-			++X;
-		}
-		//Else just increment upon a single column one cell
-		else
-		{
-			++Y;
-		}
-	}
+	UE_LOG(LogTemp, Warning, TEXT("GridArray Size: %d"), NewGridArray.Num());
 
 	return NewGridArray;
 }
@@ -232,8 +224,11 @@ FVector ABoxGridActor::GetCellLocationFromAddress(FCellAddress Address)
 	FVector Loc = GetActorLocation();
 
 	//World location of a cell is equal to the actor's location + CellAddress * CellSize - half of our CellSize
-	float X = Loc.X + (Address.Row + 1) * CellSize - CellSize * 0.5f;//(Address.Row * CellSize) - (CellSize * 0.5f);
-	float Y = Loc.Y + (Address.Col + 1) * CellSize - CellSize * 0.5f;//(Address.Col * CellSize) - (CellSize * 0.5f);
+	float X = Loc.X + (Address.Y + 1) * CellSize - CellSize * 0.5f;//(Address.X * CellSize) - (CellSize * 0.5f);
+	//float Y = Loc.Y + (Address.Y + 1) * CellSize - CellSize * 0.5f;//(Address.Y * CellSize) - (CellSize * 0.5f);
+
+	float Y = Loc.Y - ((Address.X + 1) * CellSize - CellSize * 0.5f);
+
 
 	return FVector(X, Y, Loc.Z);
 }
@@ -245,21 +240,21 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 		We check here for validity
 	*/
 	FVector ActLoc = GetActorLocation();
-	if (Location.X < GetActorLocation().X || Location.Y < GetActorLocation().Y || Location.X > CellSize*GetGridExtents().X+ActLoc.X || Location.Y > CellSize*GetGridExtents().Y+ActLoc.Y)
+	if (Location.X < GetActorLocation().X || Location.Y > GetActorLocation().Y || Location.X > CellSize*GetGridExtents().X+ActLoc.X || Location.Y > CellSize*GetGridExtents().Y+ActLoc.Y)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X > CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
+		UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
 		return FCellAddress(-1, -1);
 	}
 
 	FCellAddress Address;
-	Address.Row = FMath::TruncToFloat((Location.X - ActLoc.X) / CellSize);
-	Address.Col = FMath::TruncToFloat((Location.Y - ActLoc.Y) / CellSize);
+	Address.Y = FMath::TruncToFloat(FMath::Abs(Location.X - ActLoc.X) / CellSize);
+	Address.X = FMath::TruncToFloat(FMath::Abs(Location.Y - ActLoc.Y) / CellSize);
 
 	//check for out of range
-	if (Address.Row < 0 || Address.Col < 0 || Address.Row > GetGridExtents().X || Address.Col > GetGridExtents().Y)
+	if (Address.X < 0 || Address.Y < 0 || Address.X > GetGridExtents().X-1 || Address.Y > GetGridExtents().Y-1)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Failed at Address range check: %s"), *Address.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("Exited from 2nd check: %s, %d %d"), (Address.Col > GetGridExtents().Y ? TEXT("AddX true") : TEXT("AddX false")), Address.Row, Address.Col);
+		UE_LOG(LogTemp, Warning, TEXT("Exited from 2nd check: %s, %d %d"), (Address.Y > GetGridExtents().Y ? TEXT("AddX true") : TEXT("AddX false")), Address.X, Address.Y);
 		return FCellAddress(-1, -1);
 	}
 
@@ -269,14 +264,15 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 		return Address;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Exited from 3rd check"));
+	UE_LOG(LogTemp, Warning, TEXT("Exited from 3rd check %s"), *Address.ToString());
 
 	return FCellAddress(-1, -1);
 }
 
 int32 ABoxGridActor::GetIndexFromAddress(FCellAddress Address) const
 {
-	return (GetGridExtents().Y * Address.Row) + Address.Col;
+	//return (GetGridExtents().Y * Address.X) + Address.Y;
+	return Address.Y * GetGridExtents().Y + Address.X;
 }
 
 /*
@@ -285,16 +281,19 @@ int32 ABoxGridActor::GetIndexFromAddress(FCellAddress Address) const
 */
 bool ABoxGridActor::DoesCellExist(FCellAddress Address) const
 {
-	if (Address.Row < 0 || Address.Row > GetGridExtents().X || Address.Col < 0 || Address.Col > GetGridExtents().Y)
+	if (Address.X < 0 || Address.X > GetGridExtents().X-1 || Address.Y < 0 || Address.Y > GetGridExtents().Y-1)
 		return false;
+
+	UE_LOG(LogTemp, Warning, TEXT("A: %s"), *Address.ToString());
 
 	int32 Index = GetIndexFromAddress(Address);
 
 	if (!GridArray.IsValidIndex(Index))
 		return false;
 
-	//UE_LOG(LogTemp, Warning, TEXT("Index: %d | IsValid: %s"), Index, (GridArray.IsValidIndex(Index) ? TEXT("true") : TEXT("false")) );
-	//UE_LOG(LogTemp, Warning, TEXT("InAddress: %d, %d | IndexAddress: %d, %d"), Address.Row, Address.Col, GridArray[Index].Address.Row, GridArray[Index].Address.Col);
+	UE_LOG(LogTemp, Warning, TEXT("B: %s"), *Address.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Index: %d | IsValid: %s"), Index, (GridArray.IsValidIndex(Index) ? TEXT("true") : TEXT("false")) );
+	UE_LOG(LogTemp, Warning, TEXT("InAddress: %d, %d | IndexAddress: %d, %d | Index: %d"), Address.X, Address.Y, GridArray[Index].Address.X, GridArray[Index].Address.Y, Index);
 
 	return(GridArray.IsValidIndex(Index) && GridArray[Index].Address == Address);
 }
@@ -361,7 +360,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 	// Add the start node
 	FAStarCellInfo StartNode = FAStarCellInfo(Start, FCellAddress(-1, -1));
 	StartNode.G = 0;
-	StartNode.F = StartNode.G + FMath::Max(FMath::Abs(Start.Row - Goal.Row), FMath::Abs(Start.Col - Goal.Col));
+	StartNode.F = StartNode.G + FMath::Max(FMath::Abs(Start.X - Goal.X), FMath::Abs(Start.Y - Goal.Y));
 
 	OpenList.Add(StartNode);
 
@@ -432,7 +431,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 			{
 				// Create the f, g, and h values
 				ChildCell.G = CurrentNode.G + 1;
-				ChildCell.H = FMath::Max(FMath::Abs(ChildCell.Address.Row - Goal.Row), FMath::Abs(ChildCell.Address.Col - Goal.Col));
+				ChildCell.H = FMath::Max(FMath::Abs(ChildCell.Address.X - Goal.X), FMath::Abs(ChildCell.Address.Y - Goal.Y));
 				ChildCell.F = ChildCell.G + ChildCell.H;
 
 				bool AddToOpen = true;
@@ -470,8 +469,8 @@ TArray<FCellInfo> ABoxGridActor::GetCellNeighbors(FCellAddress Address, FGamepla
 		return Neighbours;
 	}
 
-	int32 X = Address.Row;
-	int32 Y = Address.Col;
+	int32 X = Address.X;
+	int32 Y = Address.Y;
 
 
 	//X +
@@ -560,13 +559,13 @@ void ABoxGridActor::OnUpdateGrid_Internal(const FIntPoint& OutGridExtents, const
 		{
 			//Scale mesh (maybe move this to be its own function)
 			FVector MeshScale;
-			MeshScale.X = (OutCellSize * 0.01f) * OutGridExtents.X;
-			MeshScale.Y = (OutCellSize * 0.01f) * OutGridExtents.Y;
+			MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
+			MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
 			MeshScale.Z = 1;
 			GridMeshComp->SetWorldScale3D(MeshScale);
 
-			MeshScale.X = ((OutGridExtents.X * OutCellSize) * 0.5f) + GetActorLocation().X;
-			MeshScale.Y = ((OutGridExtents.Y * OutCellSize) * 0.5f) + GetActorLocation().Y;
+			MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
+			MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
 			MeshScale.Z = GetActorLocation().Z;
 
 			GridMeshComp->SetWorldLocation(MeshScale);
