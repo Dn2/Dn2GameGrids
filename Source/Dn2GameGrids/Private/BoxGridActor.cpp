@@ -206,7 +206,7 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 	FVector ActLoc = GetActorLocation();
 	if (Location.Y < ActLoc.Y || Location.Y > ActLoc.Y + (GetGridExtents().X*CellSize) || Location.X > ActLoc.X || Location.X < ActLoc.X - (GetGridExtents().Y*CellSize))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
+		//UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
 		return FCellAddress(-1, -1);
 	}
 
@@ -217,8 +217,7 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 	//check for out of range
 	if (Address.X < 0 || Address.Y < 0 || Address.X > GetGridExtents().X-1 || Address.Y > GetGridExtents().Y-1)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Failed at Address range check: %s"), *Address.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("Exited from 2nd check: %s, %d %d"), (Address.Y > GetGridExtents().Y ? TEXT("AddX true") : TEXT("AddX false")), Address.X, Address.Y);
+		//UE_LOG(LogTemp, Warning, TEXT("Exited from 2nd check: %s, %d %d"), (Address.Y > GetGridExtents().Y ? TEXT("AddX true") : TEXT("AddX false")), Address.X, Address.Y);
 		return FCellAddress(-1, -1);
 	}
 
@@ -228,7 +227,7 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 		return Address;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Exited from 3rd check %s"), *Address.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Exited from 3rd check %s"), *Address.ToString());
 
 	return FCellAddress(-1, -1);
 }
@@ -248,16 +247,16 @@ bool ABoxGridActor::DoesCellExist(FCellAddress Address) const
 	if (Address.X < 0 || Address.X > GetGridExtents().X-1 || Address.Y < 0 || Address.Y > GetGridExtents().Y-1)
 		return false;
 
-	UE_LOG(LogTemp, Warning, TEXT("A: %s"), *Address.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("A: %s"), *Address.ToString());
 
 	int32 Index = GetIndexFromAddress(Address);
 
 	if (!GridArray.IsValidIndex(Index))
 		return false;
 
-	UE_LOG(LogTemp, Warning, TEXT("B: %s"), *Address.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Index: %d | IsValid: %s"), Index, (GridArray.IsValidIndex(Index) ? TEXT("true") : TEXT("false")) );
-	UE_LOG(LogTemp, Warning, TEXT("InAddress: %d, %d | IndexAddress: %d, %d | Index: %d"), Address.X, Address.Y, GridArray[Index].Address.X, GridArray[Index].Address.Y, Index);
+	//UE_LOG(LogTemp, Warning, TEXT("B: %s"), *Address.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Index: %d | IsValid: %s"), Index, (GridArray.IsValidIndex(Index) ? TEXT("true") : TEXT("false")) );
+	//UE_LOG(LogTemp, Warning, TEXT("InAddress: %d, %d | IndexAddress: %d, %d | Index: %d"), Address.X, Address.Y, GridArray[Index].Address.X, GridArray[Index].Address.Y, Index);
 
 	return(GridArray.IsValidIndex(Index) && GridArray[Index].Address == Address);
 }
@@ -310,7 +309,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 {
 	if (!DoesCellExist(Start) || !DoesCellExist(Goal))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found NOT FOUND. Early exit"));
+		//UE_LOG(LogTemp, Warning, TEXT("Found NOT FOUND. Early exit"));
 		return FAStarSearchResults();
 	}
 	
@@ -342,7 +341,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 			}
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Search: While Open List"));
+		//UE_LOG(LogTemp, Warning, TEXT("Search: While Open List"));
 		// Found the goal
 		//if currentNode is the goal
 		if (CurrentNode.Address == Goal)
@@ -361,7 +360,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 				});
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Found goal. Count: %d"), results.Path.Num());
+			//UE_LOG(LogTemp, Warning, TEXT("Found goal. Count: %d"), results.Path.Num());
 			Algo::Reverse(results.Path);
 			return results;
 		}
@@ -416,7 +415,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Found not FOUND: Last exit"));
+	//UE_LOG(LogTemp, Warning, TEXT("Found not FOUND: Last exit"));
 	return FAStarSearchResults();
 }
 

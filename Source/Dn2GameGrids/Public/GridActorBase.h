@@ -21,6 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd_Internal, const 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd, const FAStarSearchResults&, AStarSearchResults, const bool, GoalFound, const int32, NumberOfCells, const FCellAddress&, LastCellFound);
 
 
+
 UCLASS()
 class DN2GAMEGRIDS_API AGridActorBase : public AActor
 {
