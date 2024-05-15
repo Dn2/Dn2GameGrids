@@ -81,6 +81,11 @@ TArray<FCellInfo> AGridActorBase::CreateEmptyGrid(int32 XExtent, int32 YExtent, 
 	return TArray<FCellInfo>();
 }
 
+void AGridActorBase::PostUpdateGridSetup(bool bUpdateMaterial)
+{
+
+}
+
 FVector AGridActorBase::GetCellLocationFromAddress(FCellAddress Address)
 {
 	return FVector();

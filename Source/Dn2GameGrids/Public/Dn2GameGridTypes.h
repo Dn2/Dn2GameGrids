@@ -113,12 +113,12 @@ public:
 	*/
 	FCellAddress GetNorth(const FCellInfo& OtherInfo)
 	{
-		return FCellAddress(Address.X, Address.Y + 1);
+		return FCellAddress(Address.X, Address.Y - 1);
 	}
 
 	FCellAddress GetSouth(const FCellInfo& OtherInfo)
 	{
-		return FCellAddress(Address.X, Address.Y - 1);
+		return FCellAddress(Address.X, Address.Y + 1);
 	}
 
 	FCellAddress GetEast(const FCellInfo& OtherInfo)

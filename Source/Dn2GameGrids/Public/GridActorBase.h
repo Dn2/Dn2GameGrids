@@ -93,6 +93,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags);
 
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	virtual void PostUpdateGridSetup(bool bUpdateMaterial=true);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FVector GetCellLocationFromAddress(FCellAddress Address);

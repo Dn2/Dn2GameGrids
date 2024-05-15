@@ -28,21 +28,7 @@ ABoxGridActor::ABoxGridActor() : Super()
 		GridMeshComp->SetMaterial(0, GridMat);
 	}
 
-	if (GridMeshComp)
-	{
-		//Scale mesh (maybe move this to be its own function)
-		FVector MeshScale;
-		MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
-		MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
-		MeshScale.Z = 1;
-		GridMeshComp->SetWorldScale3D(MeshScale);
-
-		MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-		MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
-		MeshScale.Z = GetActorLocation().Z;
-
-		GridMeshComp->SetWorldLocation(MeshScale);
-	}
+	PostUpdateGridSetup(false);
 }
 
 // Called when the game starts or when spawned
@@ -68,28 +54,8 @@ void ABoxGridActor::Tick(float DeltaTime)
 
 /*void ABoxGridActor::OnConstruction(const FTransform& Transform)
 {
-	if (GridMeshComp)
-	{
-		//Scale mesh (maybe move this to be its own function)
 
-		FVector MeshScale;
-		MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
-		MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
-		MeshScale.Z = 1;
-		GridMeshComp->SetRelativeScale3D(MeshScale);
-
-
-		MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-		MeshScale.Y = ((GetGridExtents().Y * CellSize) * 0.5f) + GetActorLocation().Y;
-		MeshScale.Z = GetActorLocation().Z;
-
-		GridMeshComp->SetWorldLocation(MeshScale);/ ** /
-
-		GridMeshComp->UpdateBounds();
-		GridMeshComp->UpdateComponentToWorld(EUpdateTransformFlags::PropagateFromParent);
-	}
 }*/
-
 
 
 #if WITH_EDITOR
@@ -99,39 +65,7 @@ void ABoxGridActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 
 	if (e.GetPropertyName().ToString() == "X"|| "Y" || "DefaultGridExtents" || "CellSize")
 	{
-
-		if (GridMeshComp)
-		{
-			//Scale mesh (maybe move this to be its own function)
-			FVector MeshScale;
-			MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
-			MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
-			MeshScale.Z = 1;
-			GridMeshComp->SetWorldScale3D(MeshScale);
-
-			MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-			MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
-			MeshScale.Z = GetActorLocation().Z;
-
-			GridMeshComp->SetWorldLocation(MeshScale);
-			//UE_LOG(LogTemp, Warning, TEXT("Property changed: %s"), *e.GetPropertyName().ToString());
-
-
-			if (!GridMatInst && GridMat)
-			{
-				GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
-				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
-				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
-
-				GridMeshComp->SetMaterial(0, GridMatInst);
-			}
-			else if (GridMatInst)
-			{
-				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
-				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
-				GridMeshComp->SetMaterial(0, GridMatInst);
-			}
-		}
+		PostUpdateGridSetup();
 	}
 }
 #endif
@@ -189,13 +123,17 @@ TArray<FCellInfo> ABoxGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 	int32 Y = 0;
 	//int32 Index = 0;
 
-	while (Y < YExtent+1)
+	/*
+	*	Creating our grid...
+	*/
+	while (Y < YExtent)
 	{
 
-		while (X < XExtent+1)
+		while (X < XExtent)
 		{
-			NewGridArray.Add(FCellInfo(FCellAddress(X, Y)));
-			NewGridArray.Last().CellTags.AppendTags(DefaultTags);
+			FCellInfo NewCell = FCellInfo(FCellAddress(X, Y));
+			NewCell.CellTags.AppendTags(DefaultTags);
+			NewGridArray.Add(NewCell);
 
 			++X;
 		}
@@ -204,17 +142,47 @@ TArray<FCellInfo> ABoxGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 		Y++;
 	}
 
-
-	/*
-	*	Creating our grid...
-	*	Where X = number of rows and Y = number of columns.
-	*	So while X is less than the number of rows we need (GridExtents.X),
-	*	keep adding cells with the appropriate addresses.
-	*	Ends when we run out of rows.
-	*/
 	UE_LOG(LogTemp, Warning, TEXT("GridArray Size: %d"), NewGridArray.Num());
 
 	return NewGridArray;
+}
+
+
+void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
+{
+	if (GridMeshComp)
+	{
+		//Scale mesh (maybe move this to be its own function)
+		FVector MeshScale;
+		MeshScale.X = (CellSize * 0.01f) * GetGridExtents().Y;
+		MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().X;
+		MeshScale.Z = 1;
+		GridMeshComp->SetWorldScale3D(MeshScale);
+		
+		MeshScale.X = GetActorLocation().X - (GetGridExtents().Y * CellSize) * 0.5f;
+		MeshScale.Y = GetActorLocation().Y + (GetGridExtents().X * CellSize) * 0.5f;
+		MeshScale.Z = GetActorLocation().Z;
+
+		GridMeshComp->SetWorldLocation(MeshScale);
+
+		if (bUpdateMaterial)
+		{
+			if (!GridMatInst && GridMat)
+			{
+				GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+
+				GridMeshComp->SetMaterial(0, GridMatInst);
+			}
+			else if (GridMatInst)
+			{
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+				GridMeshComp->SetMaterial(0, GridMatInst);
+			}
+		}
+	}
 }
 
 
@@ -223,12 +191,8 @@ FVector ABoxGridActor::GetCellLocationFromAddress(FCellAddress Address)
 	//Actor's origin will be 0,0 of our grid
 	FVector Loc = GetActorLocation();
 
-	//World location of a cell is equal to the actor's location + CellAddress * CellSize - half of our CellSize
-	float X = Loc.X + (Address.Y + 1) * CellSize - CellSize * 0.5f;//(Address.X * CellSize) - (CellSize * 0.5f);
-	//float Y = Loc.Y + (Address.Y + 1) * CellSize - CellSize * 0.5f;//(Address.Y * CellSize) - (CellSize * 0.5f);
-
-	float Y = Loc.Y - ((Address.X + 1) * CellSize - CellSize * 0.5f);
-
+	float Y = Loc.Y + (Address.X + 1) * CellSize - CellSize * 0.5f;
+	float X = Loc.X - ((Address.Y + 1) * CellSize - CellSize * 0.5f);
 
 	return FVector(X, Y, Loc.Z);
 }
@@ -240,15 +204,15 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 		We check here for validity
 	*/
 	FVector ActLoc = GetActorLocation();
-	if (Location.X < GetActorLocation().X || Location.Y > GetActorLocation().Y || Location.X > CellSize*GetGridExtents().X+ActLoc.X || Location.Y > CellSize*GetGridExtents().Y+ActLoc.Y)
+	if (Location.Y < ActLoc.Y || Location.Y > ActLoc.Y + (GetGridExtents().X*CellSize) || Location.X > ActLoc.X || Location.X < ActLoc.X - (GetGridExtents().Y*CellSize))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
 		return FCellAddress(-1, -1);
 	}
 
 	FCellAddress Address;
-	Address.Y = FMath::TruncToFloat(FMath::Abs(Location.X - ActLoc.X) / CellSize);
 	Address.X = FMath::TruncToFloat(FMath::Abs(Location.Y - ActLoc.Y) / CellSize);
+	Address.Y = FMath::TruncToFloat(FMath::Abs(Location.X - ActLoc.X) / CellSize);
 
 	//check for out of range
 	if (Address.X < 0 || Address.Y < 0 || Address.X > GetGridExtents().X-1 || Address.Y > GetGridExtents().Y-1)
@@ -272,7 +236,7 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 int32 ABoxGridActor::GetIndexFromAddress(FCellAddress Address) const
 {
 	//return (GetGridExtents().Y * Address.X) + Address.Y;
-	return Address.Y * GetGridExtents().Y + Address.X;
+	return Address.Y * GetGridExtents().X + Address.X;
 }
 
 /*
@@ -349,8 +313,7 @@ FAStarSearchResults ABoxGridActor::AStarSearchToGoal(FCellAddress Start, FCellAd
 		UE_LOG(LogTemp, Warning, TEXT("Found NOT FOUND. Early exit"));
 		return FAStarSearchResults();
 	}
-		
-
+	
 
 	// Initialize both open and closed list
 	TArray<FAStarCellInfo> OpenList;
@@ -542,7 +505,6 @@ TArray<FCellInfo> ABoxGridActor::GetCellNeighbors(FCellAddress Address, FGamepla
 		}
 	}
 
-
 	//UE_LOG(LogTemp, Warning, TEXT("Neighbours: %d"), Neighbours.Num());
 
 	return Neighbours;
@@ -555,63 +517,12 @@ void ABoxGridActor::OnUpdateGrid_Internal(const FIntPoint& OutGridExtents, const
 		UE_LOG(LogTemp, Warning, TEXT("Done Updating Grid!"));
 		SetBusy(false);
 
-		if (GridMeshComp)
+		PostUpdateGridSetup();
+
+		//call blueprint event
+		if (OnUpdateGridDelBP.IsBound())
 		{
-			//Scale mesh (maybe move this to be its own function)
-			FVector MeshScale;
-			MeshScale.X = (CellSize * 0.01f) * GetGridExtents().X;
-			MeshScale.Y = (CellSize * 0.01f) * GetGridExtents().Y;
-			MeshScale.Z = 1;
-			GridMeshComp->SetWorldScale3D(MeshScale);
-
-			MeshScale.X = ((GetGridExtents().X * CellSize) * 0.5f) + GetActorLocation().X;
-			MeshScale.Y = GetActorLocation().Y - ((GetGridExtents().Y * CellSize) * 0.5f);
-			MeshScale.Z = GetActorLocation().Z;
-
-			GridMeshComp->SetWorldLocation(MeshScale);
-
-			//offset based on origin
-/*
-			FVector Loc = MeshScale * OutCellSize / 2;
-			Loc.Z = 0;
-			Loc = Loc + GetActorLocation();
-			switch (MeshAlignment)
-			{
-			case EGridMeshAlignment::GMO_Center:
-				GridMeshComp->SetWorldLocation(GetActorLocation());
-				break;
-
-			case EGridMeshAlignment::GMO_Origin:
-				GridMeshComp->SetWorldLocation(Loc);
-				break;
-
-			default: break;
-			}*/
-
-
-			if (!GridMatInst && GridMat)
-			{
-				GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
-				GridMatInst->SetScalarParameterValue(FName("X"), OutGridExtents.X);
-				GridMatInst->SetScalarParameterValue(FName("Y"), OutGridExtents.Y);
-
-				GridMeshComp->SetMaterial(0, GridMatInst);
-			}
-			else if(GridMatInst)
-			{
-				GridMatInst->SetScalarParameterValue(FName("X"), OutGridExtents.X);
-				GridMatInst->SetScalarParameterValue(FName("Y"), OutGridExtents.Y);
-				GridMeshComp->SetMaterial(0, GridMatInst);
-			}
-
-
-
-			//call blueprint event
-			if (OnUpdateGridDelBP.IsBound())
-			{
-				OnUpdateGridDelBP.Broadcast(OutGridExtents, OutCellArray, OutCellSize);
-			}
-
+			OnUpdateGridDelBP.Broadcast(OutGridExtents, OutCellArray, OutCellSize);
 		}
 	});
 }
@@ -622,7 +533,6 @@ void ABoxGridActor::OnAStarSearchEnd_Internal(const FAStarSearchResults& AStarSe
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Done AStar path finding!!"));
 		SetBusy(false);
-
 
 		//call blueprint event
 		if (OnAStarSearchEndDelBP.IsBound())
