@@ -31,7 +31,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 
 - **Cell Tags**: `FGameplayTagContainer` that holds the `FGameTags` that are associated with a `Cell Info`.
 
-- **Grid Extents**: The extents of the grid. A `FIntPoint`, X being number if rows and Y being number if column.
+- **Grid Extents**: The extents of the grid. A `FIntPoint`, X being how many cells wide and Y being how many cells 'tall'.
 
 - **Neighbors**: Any cells directly next to a given cell. e.g. `GetCellNeighbors()` returns cells next to a given cell.
 
@@ -40,7 +40,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 ## Types
 | Name | Members | Description |
 |-|-|-|
-| FCellAddress | `int32 Row` `in32 Col` | Coordinates for a cell, Row and Column|
+| FCellAddress | `int32 X` `in32 Y` | Coordinates for a cell, X and Y|
 | FCellInfo | `FCellAddress Address` `FGameplayTagContainer CellTags`| Used for grid array. Holds info for each cell in the grid array |
 | FAStarCellInfo | `float H` `float G` `float F` `FCellAddress Address` `FCellAddress CameFrom` | Used for the A-Star algo |
 | FAStarSearchResults | `bool bFoundGoal` `TArray<FCellAddress> Path` | Struct holding the results of AStar search algorithm |
@@ -69,7 +69,7 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 |-|-|-|-|
 | **UpdateGridAsync** | Yes | Yes | Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation. |
 | **GetPathToGoalAsync** | Yes | Yes |Create default grid for this grid actor. Populates `TArray<FCellInfo> GridArray`. On completion calls C++ event `ABoxGridActor::OnUpdateGrid_Internal` and blueprint event `ABoxGridActor::OnUpdateGrid` with the results of the grid creation|
-| **CreateEmptyGrid** | Yes | Yes | Create a grid array that you can do what you want with. Not Async. No sort of setups of anything. Just an array of `FCellInfo` |
+| **CreateEmptyGrid** | Yes | Yes | Create a grid array that you can do what you want with. Not Async. No sort of setups of anything. Just returns an array of `FCellInfo` |
 | **AStarSearchToGoal** | Yes | Yes | Not Async. Try to find a path to the goal given addresses and optional filters, using an AStar pathfinding algorithm |
 | **GetCellLocationFromAddress**| Yes | Yes | Given the address of a cell (e.g 12,24) return the cell's world location. Uses the Actor's GridArray |
 | **GetCellAddressFromLocation** | Yes | Yes | Given a world location (e.g `FVector(123,456,10)`) return a cell address IF the address is valid. Return value of `FCellAddress(-1,-1)` means there is no cell associated with given location. Uses the Actor's GridArray |
