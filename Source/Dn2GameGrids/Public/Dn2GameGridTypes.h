@@ -171,8 +171,18 @@ public:
 	FCellAddress Address = FCellAddress(-1, -1);
 
 
-	//UPROPERTY(BlueprintReadWrite, Category = "Cell Info")
-	//FIntPoint OwnerExtent;
+/*
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
+	FCellAddress North;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
+	FCellAddress South;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
+	FCellAddress East;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
+	FCellAddress West;*/
 
 
 	/*
@@ -201,7 +211,9 @@ FORCEINLINE FCellInfo::FCellInfo()
 {}
 FORCEINLINE FCellInfo::FCellInfo(FCellAddress InAddress)
 	: Address(InAddress)
-{}
+{
+	//if(InAddress.X > -1 && InAddress.Y-1 > -1)
+}
 FORCEINLINE FCellInfo::FCellInfo(FCellAddress InAddress, FGameplayTagContainer InCellTags)
 	: Address(InAddress), CellTags(InCellTags)
 {}
