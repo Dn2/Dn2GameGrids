@@ -21,6 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd_Internal, const 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd, const FAStarSearchResults&, AStarSearchResults, const bool, GoalFound, const int32, NumberOfCells, const FCellAddress&, LastCellFound);
 
 
+
 UCLASS()
 class DN2GAMEGRIDS_API AGridActorBase : public AActor
 {
@@ -93,6 +94,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags);
 
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	virtual void PostUpdateGridSetup(bool bUpdateMaterial=true);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FVector GetCellLocationFromAddress(FCellAddress Address);
@@ -158,6 +161,10 @@ public:
 	*/
 	void SetGridExtents(FIntPoint Extents);
 
+
+	virtual void ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName> CellDictionary);
+
+
 	UPROPERTY()
 	USceneComponent* SceneComp;
 
@@ -213,4 +220,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
 
+
+	//Wave function collapse stuff
+	UFUNCTION(BlueprintCallable, Category = "GridGame|WFC")
+	TArray<FColor> ImageToFColorArray(UTexture2D* Texture, int32 TestIndex);
 };

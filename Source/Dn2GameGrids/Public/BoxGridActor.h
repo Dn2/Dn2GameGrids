@@ -39,6 +39,8 @@ public:
 	//UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags) override;
 
+	virtual void PostUpdateGridSetup(bool bUpdateMaterial = true) override;
+
 	//UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FVector GetCellLocationFromAddress(FCellAddress Address) override;
 
