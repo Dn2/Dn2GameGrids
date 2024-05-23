@@ -11,7 +11,7 @@ UGridMovementComponent::UGridMovementComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
-	MoveLerpTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("MoevLerpTLComp"));
+	MoveLerpTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("MoveLerpTLComp"));
 
 	if (GameSpeed <= 0.0f)
 		GameSpeed = 1;
