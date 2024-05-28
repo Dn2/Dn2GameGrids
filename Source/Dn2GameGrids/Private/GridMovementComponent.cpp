@@ -128,24 +128,90 @@ void UGridMovementComponent::OnTimelineEnd()
 	OnTimelineEndDelegate.Broadcast();
 }
 
-void UGridMovementComponent::StartMove()
+
+bool UGridMovementComponent::IsMoving()
 {
-	if (MoveLerpTimeline && fCurve && !MoveLerpTimeline->IsPlaying())
+	return MoveLerpTimeline && MoveLerpTimeline->IsPlaying();
+}
+
+
+void UGridMovementComponent::StartMove(bool bUnpaused)
+{
+	if (MoveLerpTimeline && fCurve && !MoveLerpTimeline->IsPlaying() && TargetPath.IsValidIndex(0))
 	{
-		MoveLerpTimeline->PlayFromStart();
+		if (bUnpaused)
+		{
+			/* 
+			*	normally set by the first tick of the timeline. since this isnt from the tick if its unpausing, we do it here
+			*/
+			FromAddress = AddressOnGrid;
+			UpdateGridLocationData(TargetPath[0]);
+			ToAddress = AddressOnGrid;
+
+			// should add param for passing if was unpaused
+			OnTimelineStartDelegate.Broadcast();
+
+			MoveLerpTimeline->Play();
+		}
+		else
+		{
+			MoveLerpTimeline->PlayFromStart();
+		}
+
 	}
 }
 
 
+bool UGridMovementComponent::SetMovePath(TArray<FCellAddress> InPath, bool bAutoPlay)
+{
+	if (InPath.IsValidIndex(0))
+	{
+		TargetPath = InPath;
+
+
+		if (bAutoPlay && MoveLerpTimeline && fCurve)
+		{
+			StartMove(false);
+		}
+	}
+	
+	return false;
+}
+
+bool UGridMovementComponent::PauseMove(bool bFinishCurrent)
+{
+	if (MoveLerpTimeline && MoveLerpTimeline->IsPlaying())
+	{
+		if (bFinishCurrent)
+		{
+			bPendingMovementInterrupt = true;
+		}
+		else
+		{
+			MoveLerpTimeline->Stop();
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCellAddress InAddress, bool Placed/*=true*/, bool SilentMove/*=true*/)
 {
 	AActor* OwningActor = GetOwner();
-	if (OwningGrid && OwningGrid->DoesCellExist(InAddress) && OwningActor && !OwningActor->IsPendingKillPending())
+
+/*
+	UE_LOG(LogTemp, Warning, TEXT("OwningActor IsValid: %s"), (GridActor->DoesCellExist(InAddress) ? TEXT("true") : TEXT("false")));
+	UE_LOG(LogTemp, Warning, TEXT("SetLocGridActor InHere: %s"), *InAddress.ToString());*/
+
+	if (GridActor && GridActor->DoesCellExist(InAddress) && OwningActor && !OwningActor->IsPendingKillPending())
 	{
+		OwningGrid = GridActor;
 		OwningActor->SetActorLocation(OwningGrid->GetCellLocationFromAddress(InAddress), false);
 		UpdateGridLocationData(InAddress);
 
 		OnTimelineLocationChangedDelegate.Broadcast(Placed, SilentMove);
+		return true;
 	}
 
 	return false;

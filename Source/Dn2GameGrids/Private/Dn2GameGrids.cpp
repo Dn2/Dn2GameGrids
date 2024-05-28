@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "GameplayTagsManager.h"
 #include "Dn2GameGrids.h"
+#include "GameplayTagsManager.h"
 
 #define LOCTEXT_NAMESPACE "FDn2GameGridsModule"
 

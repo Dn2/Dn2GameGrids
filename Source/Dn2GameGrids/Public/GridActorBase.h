@@ -180,7 +180,7 @@ public:
 	EGridMeshAlignment MeshAlignment;
 
 	//the material we'll make and instance of and use for visual debugging
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
 	UMaterial* GridMat;
 
 	UPROPERTY(BlueprintReadWrite, Category = Grid)

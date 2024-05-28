@@ -62,10 +62,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	void OnTimelineEnd();
 
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	bool IsMoving();
 
+	/* bUnpause = play from current position, i.e. from the beginning of timeline or center if grid */
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	void StartMove(bool bUnpaused);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	void StartMove();
+	bool SetMovePath(TArray<FCellAddress> InPath, bool bAutoPlay);
+
+
+	//Stop after current "cell to cell" lerp but keep leftover path.
+	bool PauseMove(bool bFinishCurrent);
+
+
+	//void StopMove(bool bCancelInProgress);
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	float GameSpeed;
@@ -101,7 +114,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellAddress> TargetPath;
 
-
+	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual bool SetActorGridLocation(AGridActorBase* GridActor, FCellAddress InAddress, bool Placed=true, bool SilentMove=true);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)

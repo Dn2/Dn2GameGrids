@@ -29,4 +29,16 @@ public:
 	/**  
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Set Blocked (CellInfo)", CompactNodeTitle = "SetBlocked", Keywords = "Block Blocked"), Category = "GridGame|CellInfo")
 	static void Set_CellInfoBlocked(FCellAddress Cell, bool Blocked);*/
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "To North", CompactNodeTitle = "N", BlueprintAutocast), Category = GameGrid)
+	static FCellAddress Conv_GetCellNorth(FCellAddress Address);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "To South", CompactNodeTitle = "S", BlueprintAutocast), Category = GameGrid)
+	static FCellAddress Conv_GetCellSouth(FCellAddress Address);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "To East", CompactNodeTitle = "E", BlueprintAutocast), Category = GameGrid)
+	static FCellAddress Conv_GetCellEast(FCellAddress Address);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "To West", CompactNodeTitle = "W", BlueprintAutocast), Category = GameGrid)
+	static FCellAddress Conv_GetCellWest(FCellAddress Address);
 };

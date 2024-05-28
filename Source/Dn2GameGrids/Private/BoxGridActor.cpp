@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "GameplayTagsManager.h"
 #include "BoxGridActor.h"
+#include "GameplayTagsManager.h"
 
 // Sets default values
 ABoxGridActor::ABoxGridActor() : Super()
@@ -14,18 +14,29 @@ ABoxGridActor::ABoxGridActor() : Super()
 
 	OnAStarSearchEndDelCPP.AddDynamic(this, &ABoxGridActor::OnAStarSearchEnd_Internal);
 	OnAStarSearchEndDelBP.AddDynamic(this, &ABoxGridActor::OnAStarSearchEnd);
-
+	UE_LOG(LogTemp, Warning, TEXT("0rd..."));
 	//load default grid mesh and material
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GridMeshObj(TEXT("/Dn2GameGrids/StaticMeshes/Gridx100.Gridx100"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/GridChecker_Mat.GridChecker_Mat"));
 	if (GridMeshComp && GridMeshObj.Object)
 	{
 		GridMeshComp->SetStaticMesh(GridMeshObj.Object);
+		UE_LOG(LogTemp, Warning, TEXT("1rd..."));
 	}
-	if (GridMeshComp && GridMatObj.Object)
+
+	if (GridMeshComp && !GridMeshComp->GetMaterial(0) && GridMatObj.Object)
 	{
 		GridMat = GridMatObj.Object;
 		GridMeshComp->SetMaterial(0, GridMat);
+		UE_LOG(LogTemp, Warning, TEXT("2rd..."));
+	}
+	else if (GridMeshComp && GridMeshComp->GetMaterial(0))
+	{
+		GridMat = Cast<UMaterial>(GridMeshComp->GetMaterial(0));
+		GridMeshComp->SetMaterial(0, GridMat);
+
+		UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (GridMat ? TEXT("GridMat true") : TEXT("GridMat false")));
+		UE_LOG(LogTemp, Warning, TEXT("3rd... %s"), *GridMat->GetFName().ToString());
 	}
 
 	PostUpdateGridSetup(false);
@@ -247,10 +258,9 @@ bool ABoxGridActor::DoesCellExist(FCellAddress Address) const
 	if (Address.X < 0 || Address.X > GetGridExtents().X-1 || Address.Y < 0 || Address.Y > GetGridExtents().Y-1)
 		return false;
 
-	//UE_LOG(LogTemp, Warning, TEXT("A: %s"), *Address.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Passed First: %s"), *Address.ToString());
 
 	int32 Index = GetIndexFromAddress(Address);
-
 	if (!GridArray.IsValidIndex(Index))
 		return false;
 
