@@ -11,7 +11,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineTickDel, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineLocationChangedDel, float, Placed, float, SilentMove);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTimelineStartDel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineStartDel, bool, bFromPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTimelineEndDel);
 
 UCLASS( ClassGroup=(Grid), meta=(BlueprintSpawnableComponent) )
@@ -67,7 +67,7 @@ public:
 
 	/* bUnpause = play from current position, i.e. from the beginning of timeline or center if grid */
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	void StartMove(bool bUnpaused);
+	bool StartMove(bool bUnpaused);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	bool SetMovePath(TArray<FCellAddress> InPath, bool bAutoPlay);
@@ -77,7 +77,7 @@ public:
 	bool PauseMove(bool bFinishCurrent);
 
 
-	//void StopMove(bool bCancelInProgress);
+	bool StopMove(bool bFinishCurrent, bool bStayAtTarget = true, bool bClearPath = false);
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
@@ -118,5 +118,8 @@ public:
 	virtual bool SetActorGridLocation(AGridActorBase* GridActor, FCellAddress InAddress, bool Placed=true, bool SilentMove=true);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	virtual void UpdateGridLocationData(FCellAddress NewAddress);
+	virtual void SetGridLocationData(FCellAddress NewAddress);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = Grid)
+	virtual FCellAddress GetGridLocationData();
 };

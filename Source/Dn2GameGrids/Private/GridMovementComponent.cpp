@@ -59,12 +59,12 @@ void UGridMovementComponent::OnTimelineTick(float val)
 		if (val == 0.0f)
 		{
 			FromAddress = AddressOnGrid;
-			UpdateGridLocationData(TargetPath[0]);
+			SetGridLocationData(TargetPath[0]);
 			ToAddress = AddressOnGrid;
 
 			//++CurrentTurn;
 			//OnTimelineBegin();
-			OnTimelineStartDelegate.Broadcast();
+			OnTimelineStartDelegate.Broadcast(false);
 		}
 
 		//UAStarGISubsystem* MySubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UAStarGISubsystem>();
@@ -135,8 +135,17 @@ bool UGridMovementComponent::IsMoving()
 }
 
 
-void UGridMovementComponent::StartMove(bool bUnpaused)
+bool UGridMovementComponent::StartMove(bool bUnpaused)
 {
+	/* Check for valid cell before trying to lerp. fail if cell is invalid*/
+	if (TargetPath.IsValidIndex(0) && OwningGrid)
+	{
+		if (!OwningGrid->DoesCellExist(TargetPath[0]))
+		{
+			return false;
+		}
+	}
+
 	if (MoveLerpTimeline && fCurve && !MoveLerpTimeline->IsPlaying() && TargetPath.IsValidIndex(0))
 	{
 		if (bUnpaused)
@@ -145,20 +154,26 @@ void UGridMovementComponent::StartMove(bool bUnpaused)
 			*	normally set by the first tick of the timeline. since this isnt from the tick if its unpausing, we do it here
 			*/
 			FromAddress = AddressOnGrid;
-			UpdateGridLocationData(TargetPath[0]);
+			SetGridLocationData(TargetPath[0]);
 			ToAddress = AddressOnGrid;
 
 			// should add param for passing if was unpaused
-			OnTimelineStartDelegate.Broadcast();
+			OnTimelineStartDelegate.Broadcast(bUnpaused);
 
 			MoveLerpTimeline->Play();
+
+			return true;
 		}
 		else
 		{
+			//Starting tick well do our broadcast
 			MoveLerpTimeline->PlayFromStart();
+
+			return true;
 		}
 
 	}
+	return false;
 }
 
 
@@ -196,6 +211,40 @@ bool UGridMovementComponent::PauseMove(bool bFinishCurrent)
 	return false;
 }
 
+
+bool UGridMovementComponent::StopMove(bool bFinishCurrent, bool bStayAtTarget /*= true*/, bool bClearPath /*= false*/)
+{
+	if (MoveLerpTimeline && MoveLerpTimeline->IsPlaying())
+	{
+		if (bFinishCurrent)
+		{
+			bPendingMovementInterrupt = true;
+
+			if (bClearPath)
+			{
+				TargetPath = TArray<FCellAddress>();
+			}
+
+			return true;
+		}
+		else
+		{
+			MoveLerpTimeline->Stop();
+
+			if (bStayAtTarget)
+			{
+				return SetActorGridLocation(OwningGrid, ToAddress, false);
+			}
+			else
+			{
+				return SetActorGridLocation(OwningGrid, FromAddress, false);
+			}
+		}
+	}
+
+	return false;
+}
+
 bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCellAddress InAddress, bool Placed/*=true*/, bool SilentMove/*=true*/)
 {
 	AActor* OwningActor = GetOwner();
@@ -208,7 +257,7 @@ bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCe
 	{
 		OwningGrid = GridActor;
 		OwningActor->SetActorLocation(OwningGrid->GetCellLocationFromAddress(InAddress), false);
-		UpdateGridLocationData(InAddress);
+		SetGridLocationData(InAddress);
 
 		OnTimelineLocationChangedDelegate.Broadcast(Placed, SilentMove);
 		return true;
@@ -217,8 +266,13 @@ bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCe
 	return false;
 }
 
-void UGridMovementComponent::UpdateGridLocationData(FCellAddress NewAddress)
+void UGridMovementComponent::SetGridLocationData(FCellAddress NewAddress)
 {
 	AddressOnGrid = NewAddress;
+}
+
+FCellAddress UGridMovementComponent::GetGridLocationData()
+{
+	return AddressOnGrid;
 }
 
