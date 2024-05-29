@@ -76,6 +76,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Grid)
 	void OnAStarSearchEnd(const FAStarSearchResults& AStarSearchResults, const bool GoalFound, const int32 NumberOfCells, const FCellAddress& LastCellFound);
 
+
+	UFUNCTION()
+	virtual void OnGridLocChanged_Internal(const UObject* GridObject, const UGridMovementComponent* GridMovementComp,const FCellInfo OutCellInfo, const FVector CellWorldLocation, const bool bIsDoneMoving);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Grid)
+	void OnGridLocChanged(const UObject* GridObject, const UGridMovementComponent* GridMovementComp, const FCellInfo OutCellInfo, const FVector CellWorldLocation, const bool bIsDoneMoving);
+
+
 };
 
 /*

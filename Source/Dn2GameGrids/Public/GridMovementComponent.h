@@ -6,8 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Dn2GameGridTypes.h"
-#include "GridActorBase.h"
+//#include "GridActorBase.h"
 #include "GridMovementComponent.generated.h"
+
+// Forward Declarations
+class AGridActorBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineTickDel, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineLocationChangedDel, float, Placed, float, SilentMove);

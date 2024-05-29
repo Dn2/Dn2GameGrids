@@ -6,6 +6,7 @@
 */
 #pragma once
 
+#include "GridMovementComponent.h"
 #include "GameplayTags.h"
 #include "GameplayTagContainer.h"
 #include "Components/BillboardComponent.h"
@@ -20,6 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid, const FIntPoint&, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd_Internal, const FAStarSearchResults&, AStarSearchResults, const bool, GoalFound, const int32, NumberOfCells, const FCellAddress&, LastCellFound);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd, const FAStarSearchResults&, AStarSearchResults, const bool, GoalFound, const int32, NumberOfCells, const FCellAddress&, LastCellFound);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnObjGridLocationChanged, const UObject*, MovedObject, const UGridMovementComponent*, GridMovementComp,const FCellInfo, OutCellInfo, const FVector, CellWorldLocation, const bool, bIsDoneMoving);
 
 
 UCLASS()
@@ -62,6 +64,13 @@ public:
 
 	UPROPERTY()
 	FOnAStarSearchEnd OnAStarSearchEndDelBP;
+
+	UPROPERTY()
+	FOnObjGridLocationChanged OnObjGridLocChangedCPP;
+
+	UPROPERTY()
+	FOnObjGridLocationChanged OnObjGridLocChangedBP;
+
 
 
 	/*

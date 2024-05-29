@@ -14,7 +14,10 @@ ABoxGridActor::ABoxGridActor() : Super()
 
 	OnAStarSearchEndDelCPP.AddDynamic(this, &ABoxGridActor::OnAStarSearchEnd_Internal);
 	OnAStarSearchEndDelBP.AddDynamic(this, &ABoxGridActor::OnAStarSearchEnd);
-	UE_LOG(LogTemp, Warning, TEXT("0rd..."));
+
+	OnObjGridLocChangedCPP.AddDynamic(this, &ABoxGridActor::OnGridLocChanged_Internal);
+	OnObjGridLocChangedBP.AddDynamic(this, &ABoxGridActor::OnGridLocChanged);
+
 	//load default grid mesh and material
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GridMeshObj(TEXT("/Dn2GameGrids/StaticMeshes/Gridx100.Gridx100"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/GridChecker_Mat.GridChecker_Mat"));
@@ -551,6 +554,19 @@ void ABoxGridActor::OnAStarSearchEnd_Internal(const FAStarSearchResults& AStarSe
 	});
 }
 
+void ABoxGridActor::OnGridLocChanged_Internal(const UObject* GridObject, const UGridMovementComponent* GridMovementComp, const FCellInfo OutCellInfo, const FVector CellWorldLocation, const bool bIsDoneMoving)
+{
+	if (GridObject)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Moved: %s to: %s from: ??"), *GridObject->GetName(), *OutCellInfo.Address.ToString());
+	}
+
+
+	if (OnObjGridLocChangedBP.IsBound())
+	{
+		OnObjGridLocChangedBP.Broadcast(GridObject, GridMovementComp, OutCellInfo, CellWorldLocation, bIsDoneMoving);
+	}
+}
 
 
 

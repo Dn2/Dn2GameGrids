@@ -269,6 +269,11 @@ bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCe
 void UGridMovementComponent::SetGridLocationData(FCellAddress NewAddress)
 {
 	AddressOnGrid = NewAddress;
+
+	if (OwningGrid && OwningGrid->OnObjGridLocChangedCPP.IsBound())
+	{
+		OwningGrid->OnObjGridLocChangedCPP.Broadcast(GetOwner(), this, OwningGrid->GetCellInfoByAddress(NewAddress), OwningGrid->GetCellLocationFromAddress(NewAddress), true);
+	}
 }
 
 FCellAddress UGridMovementComponent::GetGridLocationData()
