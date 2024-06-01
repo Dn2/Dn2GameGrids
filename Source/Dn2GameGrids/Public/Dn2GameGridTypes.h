@@ -68,11 +68,11 @@ public:
 	//int32 Col;
 
 	/* Row or X coordinate for a grid cell on our grid. 0 indexed */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ShowOnlyInnerProperties))
 	int32 X;
 
 	/* Column or Y coordinate for a grid cell on our grid. 0 indexed */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ShowOnlyInnerProperties))
 	int32 Y;
 };
 FORCEINLINE FCellAddress::FCellAddress()

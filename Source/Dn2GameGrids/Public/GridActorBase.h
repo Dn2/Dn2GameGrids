@@ -107,7 +107,7 @@ public:
 	virtual void PostUpdateGridSetup(bool bUpdateMaterial=true);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
-	virtual FVector GetCellLocationFromAddress(FCellAddress Address);
+	virtual FVector GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace=false);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location);
@@ -230,7 +230,7 @@ public:
 	TArray<FCellInfo> GridArray;
 
 
-	/* Easy access to vertex that represent a plane of our cell */
+	/* Easy access to vertex that represent a plane of our cell. In world or local space */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
 

@@ -42,7 +42,7 @@ public:
 	virtual void PostUpdateGridSetup(bool bUpdateMaterial = true) override;
 
 	//UFUNCTION(BlueprintCallable, Category = Grid)
-	virtual FVector GetCellLocationFromAddress(FCellAddress Address) override;
+	virtual FVector GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace=false) override;
 
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location) override;
 

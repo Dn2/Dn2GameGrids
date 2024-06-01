@@ -86,7 +86,7 @@ void AGridActorBase::PostUpdateGridSetup(bool bUpdateMaterial)
 
 }
 
-FVector AGridActorBase::GetCellLocationFromAddress(FCellAddress Address)
+FVector AGridActorBase::GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace/*=false*/)
 {
 	return FVector();
 }

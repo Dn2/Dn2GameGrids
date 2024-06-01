@@ -200,10 +200,10 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 }
 
 
-FVector ABoxGridActor::GetCellLocationFromAddress(FCellAddress Address)
+FVector ABoxGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace/*=false*/)
 {
 	//Actor's origin will be 0,0 of our grid
-	FVector Loc = GetActorLocation();
+	FVector Loc = (bLocalSpace ? FVector(0,0,0) : GetActorLocation());
 
 	float Y = Loc.Y + (Address.X + 1) * CellSize - CellSize * 0.5f;
 	float X = Loc.X - ((Address.Y + 1) * CellSize - CellSize * 0.5f);
@@ -572,12 +572,12 @@ TArray<FVector> ABoxGridActor::GetCellVertexArray(FCellAddress InAddress, bool b
 {
 	TArray<FVector> VertexArray;
 
-	FVector Loc = GetCellLocationFromAddress(InAddress);
+	FVector Loc = GetCellLocationFromAddress(InAddress, bLocalSpace);
 
 	if (bLocalSpace)
 	{
-		FTransform WorldTrans = GetTransform();
-		Loc = WorldTrans.InverseTransformVector(Loc);
+		//FTransform WorldTrans = GetTransform();
+		//Loc = WorldTrans.InverseTransformVector(Loc);
 	}
 
 
