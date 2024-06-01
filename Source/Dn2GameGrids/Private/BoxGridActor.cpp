@@ -568,5 +568,38 @@ void ABoxGridActor::OnGridLocChanged_Internal(const UObject* GridObject, const U
 	}
 }
 
+TArray<FVector> ABoxGridActor::GetCellVertexArray(FCellAddress InAddress)
+{
+	TArray<FVector> VertexArray;
+
+	FVector Loc = GetCellLocationFromAddress(InAddress);
+	float Offset = (CellSize / 2);
+	//Box means squares, so lets add four vertex positions to the array, counter clockwise
+
+	FVector VertLoc;
+	VertLoc.Z = Loc.Z;
+
+	//top-left
+	VertLoc.X = Loc.X - Offset;
+	VertLoc.Y = Loc.Y + Offset;
+	VertexArray.Add(VertLoc);
+
+	Offset *=2;
+
+	//bottom-left
+	VertLoc.Y -= Offset;
+	VertexArray.Add(VertLoc);
+
+	//bottom-right
+	VertLoc.X += Offset;
+	VertexArray.Add(VertLoc);
+
+	//top-right
+	VertLoc.Y += Offset;
+	VertexArray.Add(VertLoc);
+
+
+	return VertexArray;
+}
 
 

@@ -109,7 +109,8 @@ public:
 
 	/******
 		Unsafe to assume these are valid addressed. First Check with DoesCellExist() before using returned.
-		Idea: add and require a grid extents var in this struct to clamp GetNorth() etc within bounds
+		Note: add and require a grid extents var in this struct to clamp GetNorth() etc within bounds
+		Notex2:above isnt needed idk
 	*/
 	FCellAddress GetNorth(const FCellInfo& OtherInfo)
 	{
@@ -130,6 +131,7 @@ public:
 	{
 		return FCellAddress(Address.X - 1, Address.Y);
 	}
+
 
 	void SetBlocked(const bool Blocked)
 	{

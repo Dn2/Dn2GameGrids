@@ -84,6 +84,8 @@ public:
 	void OnGridLocChanged(const UObject* GridObject, const UGridMovementComponent* GridMovementComp, const FCellInfo OutCellInfo, const FVector CellWorldLocation, const bool bIsDoneMoving);
 
 
+	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress) override;
+
 };
 
 /*

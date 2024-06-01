@@ -230,7 +230,13 @@ public:
 	TArray<FCellInfo> GridArray;
 
 
+	/* Easy access to vertex that represent a plane of our cell */
+	UFUNCTION(BlueprintCallable, Category = "Grid|Gen")
+	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress);
+
 	//Wave function collapse stuff
-	UFUNCTION(BlueprintCallable, Category = "GridGame|WFC")
+	UFUNCTION(BlueprintCallable, Category = "Grid|WFC")
 	TArray<FColor> ImageToFColorArray(UTexture2D* Texture, int32 TestIndex);
+
+
 };
