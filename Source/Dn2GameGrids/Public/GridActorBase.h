@@ -231,8 +231,8 @@ public:
 
 
 	/* Easy access to vertex that represent a plane of our cell */
-	UFUNCTION(BlueprintCallable, Category = "Grid|Gen")
-	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
+	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
 
 	//Wave function collapse stuff
 	UFUNCTION(BlueprintCallable, Category = "Grid|WFC")

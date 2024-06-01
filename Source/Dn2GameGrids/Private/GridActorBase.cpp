@@ -183,7 +183,7 @@ void AGridActorBase::ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName>
 
 }
 
-TArray<FVector> AGridActorBase::GetCellVertexArray(FCellAddress InAddress)
+TArray<FVector> AGridActorBase::GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace/*=true*/)
 {
 	return TArray<FVector>();
 }
