@@ -2,7 +2,7 @@
 
 Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding. An instance of a grid is managed by an Actor that holds an array of the cells (points/nodes) on the grid. There are helper functions in both C++ and Blueprints for you to manipulate the grid, it's cells and your gameplay actors. Made and tested in Unreal Engine 4.27.
 
-![A cube navigating around walls on a 5 by 5 square grid.](https://dn2.github.io/resources/img/astargrid_preview.gif) ![A Yellow trail navigating through around walls](https://dn2.github.io/resources/img/astargrid_snek.gif)
+![A cube navigating around walls on a 5 by 5 square grid.](https://dn2.github.io/resources/img/astargrid_preview.gif) <!-- ![A Yellow trail navigating through around walls](https://dn2.github.io/resources/img/astargrid_snek.gif) -->
 
 ## Features
 - [x] Async grid generation
