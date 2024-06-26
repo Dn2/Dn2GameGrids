@@ -259,7 +259,7 @@ bool UGridMovementComponent::SetActorGridLocation(AGridActorBase* GridActor, FCe
 		OwningActor->SetActorLocation(OwningGrid->GetCellLocationFromAddress(InAddress), false);
 		SetGridLocationData(InAddress);
 
-		OnTimelineLocationChangedDelegate.Broadcast(Placed, SilentMove);
+		OnLocationChangedDelegate.Broadcast(InAddress, Placed, SilentMove);
 		return true;
 	}
 
@@ -273,6 +273,11 @@ void UGridMovementComponent::SetGridLocationData(FCellAddress NewAddress)
 	if (OwningGrid && OwningGrid->OnObjGridLocChangedCPP.IsBound())
 	{
 		OwningGrid->OnObjGridLocChangedCPP.Broadcast(GetOwner(), this, OwningGrid->GetCellInfoByAddress(NewAddress), OwningGrid->GetCellLocationFromAddress(NewAddress), true);
+	}
+
+	if (OnLocationChangedDelegate.IsBound())
+	{
+		OnLocationChangedDelegate.Broadcast(NewAddress, false, false);
 	}
 }
 

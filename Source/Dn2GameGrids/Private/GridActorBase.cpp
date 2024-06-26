@@ -17,7 +17,13 @@ AGridActorBase::AGridActorBase()
 
 	GridMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GridStaticMeshComponent"));
 	GridMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	//RootComponent = GridMeshComp;
+
+	PrimaryProcMeshComp = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("PrimaryProcComponent"));
+	PrimaryProcMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	SecondaryProcMeshComp = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("SecondaryProcComponent"));
+	SecondaryProcMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
 
 	if (GridMeshComp/* && GridMesh*/)
 	{

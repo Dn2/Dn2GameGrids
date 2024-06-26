@@ -13,7 +13,7 @@
 class AGridActorBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineTickDel, float, Value);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTimelineLocationChangedDel, float, Placed, float, SilentMove);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnLocationChangedDel, FCellAddress, OutAddress, bool, Placed, bool, SilentMove);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimelineStartDel, bool, bFromPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTimelineEndDel);
 
@@ -65,7 +65,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	void OnTimelineEnd();
 
-	UFUNCTION(BlueprintCallable, Category = Grid)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	bool IsMoving();
 
 	/* bUnpause = play from current position, i.e. from the beginning of timeline or center if grid */
@@ -96,7 +96,7 @@ public:
 	FOnTimelineTickDel OnTimelineTickDelegate;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Grid")
-	FOnTimelineLocationChangedDel OnTimelineLocationChangedDelegate;
+	FOnLocationChangedDel OnLocationChangedDelegate;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Grid")
 	FOnTimelineStartDel OnTimelineStartDelegate;

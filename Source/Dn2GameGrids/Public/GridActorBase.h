@@ -6,6 +6,7 @@
 */
 #pragma once
 
+#include "ProceduralMeshComponent.h"
 #include "GridMovementComponent.h"
 #include "GameplayTags.h"
 #include "GameplayTagContainer.h"
@@ -183,6 +184,13 @@ public:
 	//Mesh component for be visual rep for the grid and trace collisions for world locations <> grid address conversions
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UStaticMeshComponent* GridMeshComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
+	UProceduralMeshComponent* PrimaryProcMeshComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
+	UProceduralMeshComponent* SecondaryProcMeshComp;
+
 
 	//Alignment enum not currently used but is meant to choose how to offset grid's 0,0 in relation to actors origin.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
