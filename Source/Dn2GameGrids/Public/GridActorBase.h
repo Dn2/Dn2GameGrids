@@ -42,7 +42,7 @@ protected:
 	void SetBusy(bool bIsBusy);
 
 	/*
-	*	My dirty way of only letting one async function run at a time so that we aren't trying to
+	*	My dirty way of only letting one async function run once at a time so that we aren't trying to
 	*	navigate the grid while creating a new one.
 	*/
 	bool IsBusy();
@@ -82,6 +82,7 @@ public:
 	*	In ABoxGridActor's case our FNonAbandonableTask is FUpdateGridTask.
 	* 
 	*	C++ and blueprint events are called on completion, Where you can do whatever.
+	*	Returns false if it cant update the grid right now because IsBusy() is true;
 	*/
 	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
 	virtual bool UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGameplayTagContainer DefaultTags);
@@ -93,6 +94,7 @@ public:
 	*	In ABoxGridActor's case our FNonAbandonableTask is FStarSearchToGoalTask.
 	* 
 	*	C++ and blueprint events are called on completion, where you can do whatever.
+	*	Returns false if it cant update the grid right now because IsBusy() is true;
 	*/
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual bool GetPathToGoalAsync(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilter, FGameplayTagContainer ExFilter, bool bConers);
@@ -125,9 +127,9 @@ public:
 	*	handled with just the include & exclude FGameplayTagContainer filters.
 	* 
 	*	e.g. You choose to place actors on the grid in the world and can only identify if
-	*	its blocking navigation with say an collision overlap check or a GetActorLocation > GetCellAddressFromLocation()
+	*	its blocking navigation with say a collision overlap check or a GetActorLocation > GetCellAddressFromLocation()
 	*	check or something that isn't mapped to a cell address.
-	*	(i.e. you do an overlap check at a cells location taking CellSize into account etc)
+	*	(i.e. you do an overlap check at a cells location taking CellSize into account etc.)
 	* 
 	*	Check address before using functions that have bool return types
 	*/
@@ -166,12 +168,12 @@ public:
 	FIntPoint GetGridExtents() const;
 
 	/*
-		Never call this on function one its own as you should never really need to set GridExtents manually.
+		Never call this function on its own as you should never really need to set GridExtents manually.
 		Use UpdateGridAsync() or CreateEmptyGrid to create a new grid.
 	*/
 	void SetGridExtents(FIntPoint Extents);
 
-
+	/* incomplete */
 	virtual void ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName> CellDictionary);
 
 
@@ -233,6 +235,7 @@ public:
 	/*
 	*	Default place to stick your array of cells. I'm not the boss of you tho so you don't have to use it.
 	*	But this actor will use this for preview in editor if you're not generating the grid at runtime.
+	*	(Also most of the built-in grid stuff default to using this as the grid)
 	*/
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
@@ -242,7 +245,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
 
-	//Wave function collapse stuff
+	//Wave function collapse stuff, not functional yet
 	UFUNCTION(BlueprintCallable, Category = "Grid|WFC")
 	TArray<FColor> ImageToFColorArray(UTexture2D* Texture, int32 TestIndex);
 
