@@ -556,11 +556,10 @@ void ABoxGridActor::OnAStarSearchEnd_Internal(const FAStarSearchResults& AStarSe
 
 void ABoxGridActor::OnGridLocChanged_Internal(const UObject* GridObject, const UGridMovementComponent* GridMovementComp, const FCellInfo OutCellInfo, const FVector CellWorldLocation, const bool bIsDoneMoving)
 {
-/*
 	if (GridObject)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Moved: %s to: %s from: ??"), *GridObject->GetName(), *OutCellInfo.Address.ToString());
-	}*/
+	}
 
 
 	if (OnObjGridLocChangedBP.IsBound())
