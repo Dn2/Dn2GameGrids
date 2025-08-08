@@ -7,9 +7,9 @@
 	"Category": "Gameplay",
 	"CreatedBy": "Dane Nurse",
 	"CreatedByURL": "https://dn2.github.io/",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "https://twitter.com/DaneNurse",
+	"DocsURL": "https://github.com/Dn2/Dn2GameGrids",
+	"MarketplaceURL": "https://dn2.itch.io/unreal-engine-game-grids",
+	"SupportURL": "https://bsky.app/profile/dn2.bsky.social",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
@@ -19,6 +19,13 @@
 			"Name": "Dn2GameGrids",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins" :
+	[
+		{
+			"Name" : "ProceduralMeshComponent",
+			"Enabled" : true
 		}
 	]
 }

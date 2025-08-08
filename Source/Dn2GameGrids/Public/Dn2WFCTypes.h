@@ -29,10 +29,10 @@ public:
 		return result;
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pattern")
 	FIntPoint PatternSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pattern")
 	TArray<FColor> PatternArray;
 };
 FORCEINLINE FWfcPattern::FWfcPattern()

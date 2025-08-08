@@ -10,6 +10,8 @@ Unreal Engine 4 plug-in for square and hex grids and simple A*(Star) pathfinding
 - [x] Non iterative cell validation
 - [x] World Location <-> Grid coordinates conversion
 - [x] GameplayTag based filtering for cell retrieval
+- [x] Cell and Cell Vertex location data
+- [x] Grid Movement Component
 
 ## Not Implemented (Yet)
 - [ ] Hexagon version

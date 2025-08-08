@@ -4,8 +4,8 @@
 
 #include "Async/AsyncWork.h"
 //#include "Dn2GameGridTypes.h"
-//#include "CoreMinimal.h"
-//#include "GameFramework/Actor.h"
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
 #include "GridActorBase.h"
 #include "BoxGridActor.generated.h"
 

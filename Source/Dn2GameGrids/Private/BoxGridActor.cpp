@@ -42,7 +42,7 @@ ABoxGridActor::ABoxGridActor() : Super()
 		UE_LOG(LogTemp, Warning, TEXT("3rd... %s"), *GridMat->GetFName().ToString());
 	}
 
-	PostUpdateGridSetup(false);
+    ABoxGridActor::PostUpdateGridSetup(false);
 }
 
 // Called when the game starts or when spawned
