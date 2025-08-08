@@ -15,25 +15,25 @@ class DN2GAMEGRIDS_API UTileObject : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	FName TileName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	TArray<TSubclassOf<UTileObject>> States;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	bool bCollapse;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	TArray<TSubclassOf<UTileObject>> Top;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	TArray<TSubclassOf<UTileObject>> Left;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	TArray<TSubclassOf<UTileObject>> Right;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Object")
 	TArray<TSubclassOf<UTileObject>> Bottom;
 
 };
