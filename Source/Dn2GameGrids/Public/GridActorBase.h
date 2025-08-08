@@ -6,15 +6,23 @@
 */
 #pragma once
 
+#include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "ProceduralMeshComponent.h"
-#include "GridMovementComponent.h"
-#include "GameplayTags.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Engine/Texture2D.h"
+//#include "GridMovementComponent.h"
+//#include "GameplayTags.h"
 #include "GameplayTagContainer.h"
 #include "Components/BillboardComponent.h"
 #include "Dn2GameGridTypes.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GridActorBase.generated.h"
+
+// Forward Declarations
+class AGridActorBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid_Internal, const FIntPoint&, gridExtents, const TArray<FCellInfo>&, OutCellArray, const float, OutCellSize);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid, const FIntPoint&, gridExtents, const TArray<FCellInfo>&, OutCellArray, const float, OutCellSize);

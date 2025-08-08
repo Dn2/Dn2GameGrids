@@ -2,6 +2,10 @@
 
 #include "BoxGridActor.h"
 #include "GameplayTagsManager.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Async/Async.h"
+#include "Engine/StaticMesh.h"
+#include "Materials/Material.h"
 
 // Sets default values
 ABoxGridActor::ABoxGridActor() : Super()

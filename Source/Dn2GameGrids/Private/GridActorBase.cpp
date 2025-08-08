@@ -2,6 +2,7 @@
 
 
 #include "GridActorBase.h"
+#include "TextureResource.h"
 
 // Sets default values
 AGridActorBase::AGridActorBase()
