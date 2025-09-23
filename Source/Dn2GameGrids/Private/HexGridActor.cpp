@@ -42,14 +42,14 @@ FVector AHexGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLo
 		case EHexOffsetMethod::HOM_ColOdd:
 		if (X % 2)
 		{
-			CellLoc.X = CellLoc.X - (CellSize/2);
+			CellLoc.X = CellLoc.X + (CellSize/2);
 		}
 		break;
 		
 		case EHexOffsetMethod::HOM_ColEven:
 		if (!(X % 2))
 		{
-			CellLoc.X = CellLoc.X - (CellSize/2);
+			CellLoc.X = CellLoc.X + (CellSize/2);
 		}
 		break;
 	}
