@@ -1,4 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ * A Hexagon will be defined as https://www.redblobgames.com/grids/hexagons/#basics
+ * CellSize is our "size" as defined in the above link (Outer circle radius)
+ */
 
 
 #include "HexGridActor.h"
@@ -19,42 +22,66 @@ TArray<FCellInfo> AHexGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 
 FVector AHexGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace)
 {
-	FVector CellLoc = Super::GetCellLocationFromAddress(Address, bLocalSpace);
-	int32 X = Address.X;
-	int32 Y = Address.Y;
+	//Actor's origin will be 0,0 of our grid
+	FVector Loc = (bLocalSpace ? FVector(0,0,0) : GetActorLocation());
+
+	//float Width = 0.0f;
+	float Horiz = 0.0f;
+	float Vert = 0.0f;
+
+	float Y=0;
+	float X=0;
+
+	if (HexOffsetMethod == EHexOffsetMethod::HOM_RowOdd || HexOffsetMethod == EHexOffsetMethod::HOM_RowEven)
+	{
+		Horiz = FMath::Sqrt(3.0f)*(CellSize);
+		Vert = (FMath::Sqrt(3.0f)*(CellSize))*0.8660255f;
+		
+		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
+        X = Loc.X - ((Address.Y + 1) * Vert - Vert);
+	}
+	else
+	{
+		Horiz = FMath::Sqrt(3.0f)*(CellSize)*0.8660255f;
+		Vert = (FMath::Sqrt(3.0f)*(CellSize));
+		
+		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
+		X = Loc.X - ((Address.Y + 1) * Vert - Vert);
+	}
+
 	
 	switch (HexOffsetMethod)
 	{
 		case EHexOffsetMethod::HOM_RowOdd:
-			if (Y % 2)
-			{
-				CellLoc.Y = CellLoc.Y + (CellSize/2);
-			}
-		break;
-		
-		case EHexOffsetMethod::HOM_RowEven:
-		if (!(Y % 2))
+		if (Address.Y % 2)
 		{
-			CellLoc.Y = CellLoc.Y + (CellSize/2);
+			Y = Y + (Horiz*0.5f);
+		}
+		break;
+
+		case EHexOffsetMethod::HOM_RowEven:
+		if (!(Address.Y % 2))
+		{
+			Y = Y + (Horiz*0.5f);
 		}
 		break;
 
 		case EHexOffsetMethod::HOM_ColOdd:
-		if (X % 2)
+		if (Address.X % 2)
 		{
-			CellLoc.X = CellLoc.X + (CellSize/2);
+			X = X + (Vert*0.5f);
 		}
 		break;
 		
 		case EHexOffsetMethod::HOM_ColEven:
-		if (!(X % 2))
+		if (!(Address.X % 2))
 		{
-			CellLoc.X = CellLoc.X + (CellSize/2);
+			X = X + (Vert*0.5f);
 		}
 		break;
 	}
-	
-	return CellLoc;
+
+	return FVector(X, Y, Loc.Z);
 }
 
 
@@ -65,5 +92,24 @@ FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 
 TArray<FVector> AHexGridActor::GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace)
 {
-	return Super::GetCellVertexArray(InAddress, bLocalSpace);
+	/*
+	 * https://www.redblobgames.com/grids/hexagons/#angles
+	 */
+	TArray<FVector> Vertices;	
+	FVector Loc = GetCellLocationFromAddress(InAddress, bLocalSpace);
+	float HexSize = (CellSize)/**0.8660255f*/;
+
+	
+	for (int i = 0; i < 6; i++)
+	{
+       	float AngleDeg = 60.0f * i/* - 30.0f*/;
+		if (HexOffsetMethod == EHexOffsetMethod::HOM_ColOdd || HexOffsetMethod == EHexOffsetMethod::HOM_ColEven)
+		{	AngleDeg-=30.0f;	}
+		
+		float AngleRad = UE_PI / 180.0f * AngleDeg;
+		
+		Vertices.Add( FVector(Loc.X + HexSize * FMath::Cos(AngleRad), Loc.Y + HexSize * FMath::Sin(AngleRad), Loc.Z) );
+	}
+	
+	return Vertices;
 }

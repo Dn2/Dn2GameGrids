@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AHexGridActor();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grid|Hex")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hex")
 	EHexOffsetMethod HexOffsetMethod;
 	
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags) override;
