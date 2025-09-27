@@ -1,6 +1,8 @@
 /*
  * A Hexagon will be defined as https://www.redblobgames.com/grids/hexagons/#basics
  * CellSize is our "size" as defined in the above link (Outer circle radius)
+ *
+ * 0.8660255f - this is the magic number. Calculated it myself but idk.
  */
 
 
