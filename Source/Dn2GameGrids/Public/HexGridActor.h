@@ -20,6 +20,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hex")
 	EHexOffsetMethod HexOffsetMethod;
+
+	/* return what will be our Outer Radius of Hex Cell i.e. CellSize/2 */
+	virtual float GetCellSize() override;
 	
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags) override;
 
