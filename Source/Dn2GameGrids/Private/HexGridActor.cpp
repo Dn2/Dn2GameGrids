@@ -49,17 +49,17 @@ FVector AHexGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLo
 		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
         X = Loc.X - ((Address.Y + 1) * Vert - Vert);
 
-		UE_LOG(LogTemp, Warning, TEXT("Row(Horiz: %f, Vert: %f"), Horiz, Vert);
+		//UE_LOG(LogTemp, Warning, TEXT("Row(Horiz: %f, Vert: %f"), Horiz, Vert);
 	}
 	else
 	{
 		Horiz = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
-		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()));
+		Vert = FMath::Sqrt(3.0f)*(GetCellSize());
 		
-		Y = Loc.Y + (Address.X + 1) * Horiz;
-		X = Loc.X - ((Address.Y + 1) * Vert);
+		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
+		X = Loc.X - ((Address.Y + 1) * Vert - Vert);
 
-		UE_LOG(LogTemp, Warning, TEXT("Col(Horiz: %f, Vert: %f"), Horiz, Vert);
+		//UE_LOG(LogTemp, Warning, TEXT("Col(Horiz: %f, Vert: %f"), Horiz, Vert);
 	}
 
 	
@@ -82,14 +82,14 @@ FVector AHexGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLo
 		case EHexOffsetMethod::HOM_ColOdd:
 		if (Address.X % 2)
 		{
-			X = X + (Vert*0.5f);
+			X = X - (Vert*0.5f);
 		}
 		break;
 		
 		case EHexOffsetMethod::HOM_ColEven:
 		if (!(Address.X % 2))
 		{
-			X = X + (Vert*0.5f);
+			X = X - (Vert*0.5f);
 		}
 		break;
 	}
@@ -107,16 +107,14 @@ FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 	float Horiz = 0.0f;
 	float Vert = 0.0f;
 
-	int OffsetCheck = 0;
+	//int OffsetCheck = 0;
 	
 	float X = 0.0f;
 	float Y = 0.0f;
 	FCellAddress Address = FCellAddress(-1,-1);
 
-
-	switch (HexOffsetMethod)
+	if (HexOffsetMethod == EHexOffsetMethod::HOM_RowOdd || HexOffsetMethod == EHexOffsetMethod::HOM_RowEven)
 	{
-		case EHexOffsetMethod::HOM_RowOdd:
 		Horiz = FMath::Sqrt(3.0f)*(GetCellSize());
 		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
 		
@@ -124,6 +122,28 @@ FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
 		Address.X = FMath::TruncToInt(X);
 		Address.Y = FMath::TruncToInt(Y);
+	}
+	else
+	{
+		Horiz = FMath::Sqrt(3.0f)*(GetCellSize())*0.8660255f;
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()));
+		
+		X = FMath::Abs(((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
+		Address.X = FMath::TruncToInt(X);
+		Address.Y = FMath::TruncToInt(Y);
+	}
+	
+	switch (HexOffsetMethod)
+	{
+		case EHexOffsetMethod::HOM_RowOdd:
+		/*Horiz = FMath::Sqrt(3.0f)*(GetCellSize());
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
+		
+		X = FMath::Abs(((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
+		Address.X = FMath::TruncToInt(X);
+		Address.Y = FMath::TruncToInt(Y);*/
 
 		if ((Address.Y % 2))
 		{
@@ -131,32 +151,37 @@ FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 		}
 		
 		//UE_LOG(LogTemp, Warning, TEXT("Value Y: %f"), ((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
-		UE_LOG(LogTemp, Warning, TEXT("Value X: %f"), ((Location.X - ActLoc.X) / (Vert))-0.5f);
+		//UE_LOG(LogTemp, Warning, TEXT("Value X: %f"), ((Location.X - ActLoc.X) / (Vert))-0.5f);
 		
 		break;
 
 		case EHexOffsetMethod::HOM_RowEven:
 		if (!(Address.Y % 2))
 		{
-			Y = Y + 0.5f;
+			X = X - 0.5f;
 		}
 		break;
 
 		case EHexOffsetMethod::HOM_ColOdd:
 		if (Address.X % 2)
 		{
-			//X = X + (Vert*0.5f);
+			Y = Y + 0.5f;
 		}
 		break;
 		
 		case EHexOffsetMethod::HOM_ColEven:
 		if (!(Address.X % 2))
 		{
-			//X = X + (Vert*0.5f);
+			Y = Y + 0.5f;
 		}
 		break;
 	}
 
+	/*if (!DoesCellExist(FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y))))
+	{
+		return FCellAddress(-1,-1);
+	}*/
+	
 	return GetClosestHexToPoint(FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y)), Location);
 	//return FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y));
 	//return Super::GetCellAddressFromLocation(Location);
@@ -216,7 +241,7 @@ FCellAddress AHexGridActor::GetClosestHexToPoint(FCellAddress Address, FVector T
 		}
 	}
 	
-	DrawDebugLine(GetWorld(),TargetLoc+FVector(0,0,10),GetCellLocationFromAddress(ClosestAddress)+FVector(0,0,10),FColor::White,true,30.0f,0,2);
+	DrawDebugLine(GetWorld(),TargetLoc+FVector(0,0,10),GetCellLocationFromAddress(ClosestAddress)+FVector(0,0,10),FColor::White,true,30.0f,0,4);
 	
 	return ClosestAddress;
 }
