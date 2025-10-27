@@ -7,6 +7,8 @@
 
 
 #include "HexGridActor.h"
+#include "DrawDebugHelpers.h"
+#include "PhysicsAssetRenderUtils.h"
 
 AHexGridActor::AHexGridActor() : Super()
 {
@@ -155,7 +157,8 @@ FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 		break;
 	}
 
-	return FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y));
+	return GetClosestHexToPoint(FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y)), Location);
+	//return FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y));
 	//return Super::GetCellAddressFromLocation(Location);
 }
 
@@ -181,4 +184,39 @@ TArray<FVector> AHexGridActor::GetCellVertexArray(FCellAddress InAddress, bool b
 	}
 	
 	return Vertices;
+}
+
+FCellAddress AHexGridActor::GetClosestHexToPoint(FCellAddress Address, FVector TargetLoc)
+{
+	//Get close cells and iterate to find the closest one
+	TArray<FCellAddress> PCellAdds;
+	PCellAdds.Add(Address);
+	
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y));
+
+	PCellAdds.Add(FCellAddress(Address.X, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X, Address.Y-1));
+
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y-1));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y-1));
+
+	//FVector AddressLoc = GetCellLocationFromAddress(Address);
+	float Dist = GetCellSize()*1000;
+	FCellAddress ClosestAddress = FCellAddress(-1,-1);
+
+	for (FCellAddress PAddress : PCellAdds)
+	{
+		if ( DoesCellExist(PAddress) && FVector::Dist2D(GetCellLocationFromAddress(PAddress), TargetLoc) < Dist )
+		{
+			Dist = FVector::Dist(GetCellLocationFromAddress(PAddress), TargetLoc);
+			ClosestAddress = PAddress;
+		}
+	}
+	
+	DrawDebugLine(GetWorld(),TargetLoc+FVector(0,0,10),GetCellLocationFromAddress(ClosestAddress)+FVector(0,0,10),FColor::White,true,30.0f,0,2);
+	
+	return ClosestAddress;
 }

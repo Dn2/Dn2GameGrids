@@ -31,4 +31,7 @@ public:
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location) override;
 
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true) override;
+
+	//Searches target address and neighbouring cells for an exact match for our target location
+	virtual FCellAddress GetClosestHexToPoint(FCellAddress Address, FVector TargetLoc);
 };
