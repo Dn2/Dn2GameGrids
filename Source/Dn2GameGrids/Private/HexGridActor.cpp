@@ -8,7 +8,7 @@
 
 #include "HexGridActor.h"
 #include "DrawDebugHelpers.h"
-#include "PhysicsAssetRenderUtils.h"
+//#include "PhysicsAssetRenderUtils.h"
 
 AHexGridActor::AHexGridActor() : Super()
 {
