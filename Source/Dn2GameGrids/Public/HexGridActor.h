@@ -18,8 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AHexGridActor();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Grid|Hex")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hex")
 	EHexOffsetMethod HexOffsetMethod;
+
+	/* return what will be our Outer Radius of Hex Cell i.e. CellSize/2 */
+	virtual float GetCellSize() override;
 	
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags) override;
 
@@ -28,4 +31,7 @@ public:
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location) override;
 
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true) override;
+
+	//Searches target address and neighbouring cells for an exact match for our target location
+	virtual FCellAddress GetClosestHexToPoint(FCellAddress Address, FVector TargetLoc);
 };

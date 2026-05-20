@@ -236,6 +236,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	float DefaultCellSize = 200;
 
+	/* For non-square grids, (hex), we might need adjust this number for generation.
+	 * For Hex grids we want its outer radius so we half this value in the override for that subclass
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
+	virtual float GetCellSize();
+
 	//Only ever applied to the bAutoGenerate grid on BeginPlay()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
 	FGameplayTagContainer DefaultCellTags;

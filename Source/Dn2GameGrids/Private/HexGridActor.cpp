@@ -1,7 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ * A Hexagon will be defined as https://www.redblobgames.com/grids/hexagons/#basics
+ * CellSize is our "size" as defined in the above link (Outer circle radius)
+ *
+ * 0.8660255f - this is the magic number. Calculated it myself but idk.
+ */
 
 
 #include "HexGridActor.h"
+#include "DrawDebugHelpers.h"
+//#include "PhysicsAssetRenderUtils.h"
 
 AHexGridActor::AHexGridActor() : Super()
 {
@@ -9,6 +16,11 @@ AHexGridActor::AHexGridActor() : Super()
 	//PrimaryActorTick.bCanEverTick = false;
 
 	HexOffsetMethod = EHexOffsetMethod::HOM_RowOdd;
+}
+
+float AHexGridActor::GetCellSize()
+{
+	return CellSize*0.5f;
 }
 
 TArray<FCellInfo> AHexGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags)
@@ -19,51 +31,217 @@ TArray<FCellInfo> AHexGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 
 FVector AHexGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace)
 {
-	FVector CellLoc = Super::GetCellLocationFromAddress(Address, bLocalSpace);
-	int32 X = Address.X;
-	int32 Y = Address.Y;
+	//Actor's origin will be 0,0 of our grid
+	FVector Loc = (bLocalSpace ? FVector(0,0,0) : GetActorLocation());
+
+	//float Width = 0.0f;
+	float Horiz = 0.0f;
+	float Vert = 0.0f;
+
+	float Y=0;
+	float X=0;
+
+	if (HexOffsetMethod == EHexOffsetMethod::HOM_RowOdd || HexOffsetMethod == EHexOffsetMethod::HOM_RowEven)
+	{
+		Horiz = FMath::Sqrt(3.0f)*(GetCellSize());
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
+		
+		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
+        X = Loc.X - ((Address.Y + 1) * Vert - Vert);
+
+		//UE_LOG(LogTemp, Warning, TEXT("Row(Horiz: %f, Vert: %f"), Horiz, Vert);
+	}
+	else
+	{
+		Horiz = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
+		Vert = FMath::Sqrt(3.0f)*(GetCellSize());
+		
+		Y = Loc.Y + (Address.X + 1) * Horiz - Horiz;
+		X = Loc.X - ((Address.Y + 1) * Vert - Vert);
+
+		//UE_LOG(LogTemp, Warning, TEXT("Col(Horiz: %f, Vert: %f"), Horiz, Vert);
+	}
+
 	
 	switch (HexOffsetMethod)
 	{
 		case EHexOffsetMethod::HOM_RowOdd:
-			if (Y % 2)
-			{
-				CellLoc.Y = CellLoc.Y + (CellSize/2);
-			}
-		break;
-		
-		case EHexOffsetMethod::HOM_RowEven:
-		if (!(Y % 2))
+		if (Address.Y % 2)
 		{
-			CellLoc.Y = CellLoc.Y + (CellSize/2);
+			Y = Y + (Horiz*0.5f);
+		}
+		break;
+
+		case EHexOffsetMethod::HOM_RowEven:
+		if (!(Address.Y % 2))
+		{
+			Y = Y + (Horiz*0.5f);
 		}
 		break;
 
 		case EHexOffsetMethod::HOM_ColOdd:
-		if (X % 2)
+		if (Address.X % 2)
 		{
-			CellLoc.X = CellLoc.X - (CellSize/2);
+			X = X - (Vert*0.5f);
 		}
 		break;
 		
 		case EHexOffsetMethod::HOM_ColEven:
-		if (!(X % 2))
+		if (!(Address.X % 2))
 		{
-			CellLoc.X = CellLoc.X - (CellSize/2);
+			X = X - (Vert*0.5f);
 		}
 		break;
 	}
-	
-	return CellLoc;
+
+	//UE_LOG(LogTemp, Warning, TEXT("Address: %s | Loc: %f, %f"), *Address.ToString(), X, Y);
+
+	return FVector(X, Y, Loc.Z);
 }
 
 
 FCellAddress AHexGridActor::GetCellAddressFromLocation(FVector Location)
 {
-	return Super::GetCellAddressFromLocation(Location);
+	FVector ActLoc = GetActorLocation();
+
+	float Horiz = 0.0f;
+	float Vert = 0.0f;
+
+	//int OffsetCheck = 0;
+	
+	float X = 0.0f;
+	float Y = 0.0f;
+	FCellAddress Address = FCellAddress(-1,-1);
+
+	if (HexOffsetMethod == EHexOffsetMethod::HOM_RowOdd || HexOffsetMethod == EHexOffsetMethod::HOM_RowEven)
+	{
+		Horiz = FMath::Sqrt(3.0f)*(GetCellSize());
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
+		
+		X = FMath::Abs(((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
+		Address.X = FMath::TruncToInt(X);
+		Address.Y = FMath::TruncToInt(Y);
+	}
+	else
+	{
+		Horiz = FMath::Sqrt(3.0f)*(GetCellSize())*0.8660255f;
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()));
+		
+		X = FMath::Abs(((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
+		Address.X = FMath::TruncToInt(X);
+		Address.Y = FMath::TruncToInt(Y);
+	}
+	
+	switch (HexOffsetMethod)
+	{
+		case EHexOffsetMethod::HOM_RowOdd:
+		/*Horiz = FMath::Sqrt(3.0f)*(GetCellSize());
+		Vert = (FMath::Sqrt(3.0f)*(GetCellSize()))*0.8660255f;
+		
+		X = FMath::Abs(((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		Y = FMath::Abs(((Location.X - ActLoc.X) / (Vert))-0.5f);
+		Address.X = FMath::TruncToInt(X);
+		Address.Y = FMath::TruncToInt(Y);*/
+
+		if ((Address.Y % 2))
+		{
+			X = X - 0.5f;
+		}
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Value Y: %f"), ((Location.Y - ActLoc.Y) / (Horiz))+0.5f);
+		//UE_LOG(LogTemp, Warning, TEXT("Value X: %f"), ((Location.X - ActLoc.X) / (Vert))-0.5f);
+		
+		break;
+
+		case EHexOffsetMethod::HOM_RowEven:
+		if (!(Address.Y % 2))
+		{
+			X = X - 0.5f;
+		}
+		break;
+
+		case EHexOffsetMethod::HOM_ColOdd:
+		if (Address.X % 2)
+		{
+			Y = Y + 0.5f;
+		}
+		break;
+		
+		case EHexOffsetMethod::HOM_ColEven:
+		if (!(Address.X % 2))
+		{
+			Y = Y + 0.5f;
+		}
+		break;
+	}
+
+	/*if (!DoesCellExist(FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y))))
+	{
+		return FCellAddress(-1,-1);
+	}*/
+	
+	return GetClosestHexToPoint(FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y)), Location);
+	//return FCellAddress(FMath::TruncToInt(X),FMath::TruncToInt(Y));
+	//return Super::GetCellAddressFromLocation(Location);
 }
 
 TArray<FVector> AHexGridActor::GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace)
 {
-	return Super::GetCellVertexArray(InAddress, bLocalSpace);
+	/*
+	 * https://www.redblobgames.com/grids/hexagons/#angles
+	 */
+	TArray<FVector> Vertices;	
+	FVector Loc = GetCellLocationFromAddress(InAddress, bLocalSpace);
+	float HexSize = (GetCellSize())/**0.8660255f*/;
+
+	
+	for (int i = 0; i < 6; i++)
+	{
+       	float AngleDeg = 60.0f * i/* - 30.0f*/;
+		if (HexOffsetMethod == EHexOffsetMethod::HOM_ColOdd || HexOffsetMethod == EHexOffsetMethod::HOM_ColEven)
+		{	AngleDeg-=30.0f;	}
+		
+		float AngleRad = UE_PI / 180.0f * AngleDeg;
+		
+		Vertices.Add( FVector(Loc.X + HexSize * FMath::Cos(AngleRad), Loc.Y + HexSize * FMath::Sin(AngleRad), Loc.Z) );
+	}
+	
+	return Vertices;
+}
+
+FCellAddress AHexGridActor::GetClosestHexToPoint(FCellAddress Address, FVector TargetLoc)
+{
+	//Get close cells and iterate to find the closest one
+	TArray<FCellAddress> PCellAdds;
+	PCellAdds.Add(Address);
+	
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y));
+
+	PCellAdds.Add(FCellAddress(Address.X, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X, Address.Y-1));
+
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y-1));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X+1, Address.Y+1));
+	PCellAdds.Add(FCellAddress(Address.X-1, Address.Y-1));
+
+	//FVector AddressLoc = GetCellLocationFromAddress(Address);
+	float Dist = GetCellSize()*1000;
+	FCellAddress ClosestAddress = FCellAddress(-1,-1);
+
+	for (FCellAddress PAddress : PCellAdds)
+	{
+		if ( DoesCellExist(PAddress) && FVector::Dist2D(GetCellLocationFromAddress(PAddress), TargetLoc) < Dist )
+		{
+			Dist = FVector::Dist(GetCellLocationFromAddress(PAddress), TargetLoc);
+			ClosestAddress = PAddress;
+		}
+	}
+	
+	DrawDebugLine(GetWorld(),TargetLoc+FVector(0,0,10),GetCellLocationFromAddress(ClosestAddress)+FVector(0,0,10),FColor::White,true,30.0f,0,4);
+	
+	return ClosestAddress;
 }
