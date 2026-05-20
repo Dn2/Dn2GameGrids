@@ -195,6 +195,17 @@ TArray<FVector> AGridActorBase::GetCellVertexArray(FCellAddress InAddress, bool 
 	return TArray<FVector>();
 }
 
+FVector AGridActorBase::GetCellDirection(FCellAddress Start, FCellAddress Target)
+{
+	FVector StartLoc = GetCellLocationFromAddress(Start);
+	FVector TargetLoc = GetCellLocationFromAddress(Target);
+
+	FVector NormalResult = TargetLoc -= StartLoc;
+	NormalResult.Normalize();
+	
+	return NormalResult;
+}
+
 TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 TestIndex)
 {
 	TArray<FColor> PixelData;

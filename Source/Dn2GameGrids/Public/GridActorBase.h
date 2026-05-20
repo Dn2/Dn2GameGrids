@@ -117,10 +117,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual void PostUpdateGridSetup(bool bUpdateMaterial=true);
 
-	UFUNCTION(BlueprintCallable, Category = Grid)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	virtual FVector GetCellLocationFromAddress(FCellAddress Address, bool bLocalSpace=false);
 
-	UFUNCTION(BlueprintCallable, Category = Grid)
+	UFUNCTION(BlueprintCallable, BlueprintPure,Category = Grid)
 	virtual FCellAddress GetCellAddressFromLocation(FVector Location);
 
 	//Convert Address to Index, where a cell should be in and array of cells
@@ -252,6 +252,10 @@ public:
 	/* Easy access to vertex that represent a plane of our cell. In world or local space */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
+
+	/* Returns a normal pointing in the direction of the target cell from the start cell */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
+	virtual FVector GetCellDirection(FCellAddress Start, FCellAddress Target);
 
 	//Wave function collapse stuff, not functional yet
 	UFUNCTION(BlueprintCallable, Category = "Grid|WFC")

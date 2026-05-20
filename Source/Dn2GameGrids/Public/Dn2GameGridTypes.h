@@ -4,6 +4,18 @@
 #include "GameplayTagContainer.h"
 #include "Dn2GameGridTypes.generated.h"
 
+
+/* Hex offset method */
+UENUM(BlueprintType)
+enum class EHexOffsetMethod : uint8
+{
+	HOM_RowOdd			UMETA(DisplayName = "Odd Row"),
+	HOM_RowEven			UMETA(DisplayName = "Even Row"),
+	HOM_ColOdd			UMETA(DisplayName = "Odd Col"),
+	HOM_ColEven			UMETA(DisplayName = "Even Col"),
+};
+
+
 /* not used */
 UENUM(BlueprintType)
 enum class EGridMeshAlignment : uint8
