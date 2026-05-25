@@ -85,6 +85,8 @@ public:
 
 
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true) override;
+	
+	virtual void BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight = 0.0f, float WallWidth = 0.0f) override;
 
 };
 

@@ -8,6 +8,7 @@
 
 #include "HexGridActor.h"
 #include "DrawDebugHelpers.h"
+//#include 
 //#include "PhysicsAssetRenderUtils.h"
 
 AHexGridActor::AHexGridActor() : Super()
@@ -203,7 +204,7 @@ TArray<FVector> AHexGridActor::GetCellVertexArray(FCellAddress InAddress, bool b
 		if (HexOffsetMethod == EHexOffsetMethod::HOM_ColOdd || HexOffsetMethod == EHexOffsetMethod::HOM_ColEven)
 		{	AngleDeg-=30.0f;	}
 		
-		float AngleRad = UE_PI / 180.0f * AngleDeg;
+		float AngleRad = PI / 180.0f * AngleDeg;
 		
 		Vertices.Add( FVector(Loc.X + HexSize * FMath::Cos(AngleRad), Loc.Y + HexSize * FMath::Sin(AngleRad), Loc.Z) );
 	}

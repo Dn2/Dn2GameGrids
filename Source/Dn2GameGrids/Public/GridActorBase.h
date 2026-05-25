@@ -6,6 +6,7 @@
 */
 #pragma once
 
+#include "MaterialEditingLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "ProceduralMeshComponent.h"
@@ -18,11 +19,13 @@
 #include "Components/BillboardComponent.h"
 #include "Dn2GameGridTypes.h"
 #include "CoreMinimal.h"
+#include "GridActorBase.h"
 #include "GameFramework/Actor.h"
 #include "GridActorBase.generated.h"
 
 // Forward Declarations
 class AGridActorBase;
+//class UMaterial;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid_Internal, const FIntPoint&, gridExtents, const TArray<FCellInfo>&, OutCellArray, const float, OutCellSize);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid, const FIntPoint&, gridExtents, const TArray<FCellInfo>&, OutCellArray, const float, OutCellSize);
@@ -253,12 +256,15 @@ public:
 	*/
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
-
-
+	
 	/* Easy access to vertex that represent a plane of our cell. In world or local space */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
 
+	/* Easy access to vertex that represent a plane of our cell. In world or local space */
+	UFUNCTION(BlueprintCallable, Category = "Grid|Gen")
+	virtual void BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight=0.0f, float WallWidth=0.0f);
+	
 	/* Returns a normal pointing in the direction of the target cell from the start cell */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual FVector GetCellDirection(FCellAddress Start, FCellAddress Target);

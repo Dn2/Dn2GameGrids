@@ -21,6 +21,7 @@ AGridActorBase::AGridActorBase()
 
 	PrimaryProcMeshComp = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("PrimaryProcComponent"));
 	PrimaryProcMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	PrimaryProcMeshComp->bUseComplexAsSimpleCollision = false;
 
 	SecondaryProcMeshComp = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("SecondaryProcComponent"));
 	SecondaryProcMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -198,6 +199,10 @@ float AGridActorBase::GetCellSize()
 TArray<FVector> AGridActorBase::GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace/*=true*/)
 {
 	return TArray<FVector>();
+}
+
+void AGridActorBase::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight, float WallWidth)
+{
 }
 
 FVector AGridActorBase::GetCellDirection(FCellAddress Start, FCellAddress Target)
