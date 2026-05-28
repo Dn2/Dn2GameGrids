@@ -215,7 +215,7 @@ public:
 		Simple flag to set or check if a cell is blocked.
 	*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")
-	bool bBlocked;
+	bool bBlocked = false;
 
 	/* Tags we can use for filtering of cells, for more robust blocking and navigation checks, etc, than just using bBlocked */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Cell Info")

@@ -10,6 +10,7 @@
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionVertexColor.h"
 
 
 // Sets default values
@@ -196,6 +197,8 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 			UMaterialExpressionConstant3Vector* Color1Node = Cast<UMaterialExpressionConstant3Vector>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionConstant3Vector::StaticClass()));
 			Color1Node->Constant = FLinearColor::Green;
 			
+			UMaterialExpressionVertexColor* VertexColor = Cast<UMaterialExpressionVertexColor>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionVertexColor::StaticClass()));
+			
 			UMaterialExpressionCustom* CustomNode = Cast<UMaterialExpressionCustom>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionCustom::StaticClass()));
 			FCustomInput InUV;
             InUV.InputName = FName("UV");
@@ -206,6 +209,7 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 			FCustomInput InY;
             InY.InputName = FName("Y");
 			
+			CustomNode->Inputs[0].InputName = FName("color");
 			
 			CustomNode->Inputs.Add(InUV);
 			CustomNode->Inputs.Add(InX);
@@ -221,6 +225,7 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 			ShaderCode.Append("float2 EdgeUV = frac(UV*(Extents*2)) - 0.5;");
 			ShaderCode.Append("float edge = step(0.48, EdgeUV.x);");
 			ShaderCode.Append("edge += saturate(step(0.48, EdgeUV.y));");
+			ShaderCode.Append("result = result*color;");
 			ShaderCode.Append("return lerp(result,EdgeColor, edge);");
 			
 			CustomNode->Code = ShaderCode;
@@ -229,14 +234,17 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 			UMaterialEditingLibrary::ConnectMaterialExpressions(CoordUVNode,"",CustomNode,"UV");
 			UMaterialEditingLibrary::ConnectMaterialExpressions(XNode,"",CustomNode,"X");
 			UMaterialEditingLibrary::ConnectMaterialExpressions(YNode,"",CustomNode,"Y");
+			UMaterialEditingLibrary::ConnectMaterialExpressions(VertexColor,"",CustomNode,"color");
 			UMaterialEditingLibrary::ConnectMaterialProperty(CustomNode,"",MP_EmissiveColor);
 			//UMaterialEditingLibrary::RecompileMaterial(GenGridMat);
+			//GenGridMat->ForceRecompileForRendering();
+			
+
 			
 			//if (GenGridMat)
 			//{
 				//GridMat = GenGridMat;
 			//}
-
 		}
 #endif
 	}
@@ -252,14 +260,35 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 		TArray<int32> Triangles = {0,1,2,0,2,3};
 		
 		TArray<FVector> Normals;
-		TArray<FVector2D> UV0;
+		TArray<FVector2D> UV0 = { FVector2D(0,1),FVector2D(0,0), FVector2D(1,0), FVector2D(1,1) };
 		TArray<FProcMeshTangent> tangents;
 		TArray<FLinearColor> colors;
+		colors.Init(FLinearColor::White, Vertices.Num());
 		
 		PrimaryProcMeshComp->ClearMeshSection(0);
 		PrimaryProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV0, colors,tangents, true);
 		//PrimaryProcMeshComp->ClearCollisionConvexMeshes();
 		//PrimaryProcMeshComp->AddCollisionConvexMesh(Vertices);
+		
+#if WITH_EDITOR
+		if (bUpdateMaterial)
+		{
+			if (!GridMatInst && GridMat)
+			{
+				GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+
+				PrimaryProcMeshComp->SetMaterial(0, GridMatInst);
+			}
+			else if (GridMatInst)
+			{
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+				PrimaryProcMeshComp->SetMaterial(0, GridMatInst);
+			}
+		}
+#endif
 	}
 	
 	//old code here
@@ -725,7 +754,7 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		TArray<int32> Triangles = {0,1,2,0,2,3};
 		
 		TArray<FVector> Normals;
-		TArray<FVector2D> UV0;
+		TArray<FVector2D> UV0 = { FVector2D(0,1),FVector2D(0,0), FVector2D(1,0), FVector2D(1,1) };
 		TArray<FProcMeshTangent> tangents;
 		TArray<FLinearColor> colors;
 		colors.Init(FLinearColor::White, Vertices.Num());
@@ -750,26 +779,38 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		
 		for (FCellInfo Cell : GridArray)
 		{
-			TArray<FVector> CellVerts = GetCellVertexArray(Cell.Address, true);
-			
-			for (FVector Vert : CellVerts)
+			//make a cube only if its a blocking tile
+			if (Cell.bBlocked || Cell.CellTags.HasAny(WallFilters))
 			{
-				Vertices.Add(Vert+FVector(0,0,WallHeight));
-				colors.Add(FLinearColor::Red);
+				TArray<FVector> CellVerts = GetCellVertexArray(Cell.Address, true);
+			
+				for (FVector Vert : CellVerts)
+				{
+					Vertices.Add(Vert+FVector(0,0,WallHeight));
+					colors.Add(FLinearColor::Red);
 				
-				Vertices.Add(Vert);
-				colors.Add(FLinearColor::Gray);
+					Vertices.Add(Vert);
+					colors.Add(FLinearColor::Gray);
+				}
+			
+				//make 5 face cube
+				int32 VertCount = FMath::Clamp(Vertices.Num()-8, 0, Vertices.Num());
+			
+				TArray<int32> Tris = { 0+VertCount, 2+VertCount, 4+VertCount, 0+VertCount, 4+VertCount, 6+VertCount }; /*top*/
+				Tris.Append( { 2+VertCount, 3+VertCount, 4+VertCount, 3+VertCount, 5+VertCount, 4+VertCount } ); /*front*/
+				Tris.Append( { 4+VertCount, 5+VertCount, 7+VertCount, 4+VertCount, 7+VertCount, 6+VertCount } ); /*right*/
+				Tris.Append( { 6+VertCount, 7+VertCount, 1+VertCount, 6+VertCount, 1+VertCount, 0+VertCount } ); /*back*/
+				Tris.Append( { 0+VertCount, 1+VertCount, 2+VertCount, 1+VertCount, 3+VertCount, 2+VertCount } ); /*left*/
+				Triangles.Append(Tris);
+			
+				SecondaryProcMeshComp->ClearMeshSection(1);
+				SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
+				
+				/*if (GridMatInst && SecondaryProcMeshComp)
+				{
+					SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
+				}*/
 			}
-			
-			//make 5 face cube
-			int32 VertCount = FMath::Clamp(Vertices.Num()-8, 0, Vertices.Num());
-			
-			TArray<int32> Tris = { 0+VertCount, 2+VertCount, 4+VertCount, 0+VertCount, 4+VertCount, 6+VertCount }; /*top*/
-			Tris.Append( { 2+VertCount, 3+VertCount, 4+VertCount, 3+VertCount, 5+VertCount, 4+VertCount } ); /*front*/
-			Triangles.Append(Tris);
-			
-			SecondaryProcMeshComp->ClearMeshSection(1);
-			SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
 		}
 	}
 }

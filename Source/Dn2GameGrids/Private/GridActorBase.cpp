@@ -116,6 +116,12 @@ bool AGridActorBase::DoesCellExist(FCellAddress) const
 
 bool AGridActorBase::IsCellBlocked(FCellAddress Address) const
 {
+	if (DoesCellExist(Address))
+	{
+		int32 Index = Address.Y * GetGridExtents().X + Address.X; //refactor
+		return GridArray[Index].bBlocked;
+	}
+	
 	return false;
 }
 
@@ -124,7 +130,8 @@ void AGridActorBase::SetCellBlocked(FCellAddress Address, bool bBlocked)
 	if (DoesCellExist(Address))
 	{
 		//TODO: change to match refactor
-		int32 Index = Address.Y * GetGridExtents().Y + Address.X;
+		//int32 Index = Address.Y * GetGridExtents().Y + Address.X; //old
+		int32 Index = Address.Y * GetGridExtents().X + Address.X; //refactor
 		GridArray[Index].SetBlocked(bBlocked);
 	}
 }

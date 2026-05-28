@@ -26,7 +26,7 @@ public class Dn2GameGrids : ModuleRules
 			new string[]
 			{
 				"Core",
-				"GameplayTags", "MaterialEditor",
+				"GameplayTags",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -40,6 +40,8 @@ public class Dn2GameGrids : ModuleRules
 				"Slate",
 				"SlateCore",
 				"ProceduralMeshComponent",
+				"MaterialEditor",
+				"UnrealEd",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
