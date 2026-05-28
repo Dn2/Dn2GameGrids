@@ -5,6 +5,7 @@
 #include "FileHelpers.h"
 #include "MaterialEditingLibrary.h"
 #include "PackageHelperFunctions.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
@@ -27,15 +28,20 @@ void FDn2GameGridsModule::StartupModule()
 	UGameplayTagsManager::Get().AddNativeGameplayTag("Cell.Nav.Blocked");
 	
 	
-	// Try to load grid debug materials
-	UObject* Asset = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Game/GridPluginAssets/M_BoxGridDebug.M_BoxGridDebug"));
+	// Try to load grid debug materials Dn2GameGrids/Content/Materials
+	UObject* Asset = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Dn2GameGrids/Content/Materials/M_BoxGridDebug.M_BoxGridDebug"));
 	if (Asset == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BoxGrid debug material not found!"));
+		UE_LOG(LogTemp, Warning, TEXT("BoxGrid debug material not found! Creating it now.."));
 		
 		// Generate and save material to project
-		
-		UMaterial* GenGridMat = NewObject<UMaterial>();
+		FString AssetPath = FString(FPaths::ProjectPluginsDir() + "Dn2GameGrids/Content/Materials/");
+		FString PackagePath = FString("/Dn2GameGrids/Content/Materials/M_BoxGridDebug");
+		UPackage* Package = CreatePackage(*PackagePath);
+	
+		UE_LOG(LogTemp, Warning, TEXT("Path: %s"), *FPaths::ProjectPluginsDir());
+	
+		UMaterial* GenGridMat = NewObject<UMaterial>(Package, UMaterial::StaticClass(), *FString("M_BoxGridDebug"), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 		
 		UMaterialExpressionScalarParameter* XNode = Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionScalarParameter::StaticClass()));
 		XNode->ParameterName = FName("X");
@@ -52,13 +58,13 @@ void FDn2GameGridsModule::StartupModule()
 		
 		UMaterialExpressionCustom* CustomNode = Cast<UMaterialExpressionCustom>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionCustom::StaticClass()));
 		FCustomInput InUV;
-        InUV.InputName = FName("UV");
+		InUV.InputName = FName("UV");
 		
-        FCustomInput InX;
-        InX.InputName = FName("X");
+		FCustomInput InX;
+		InX.InputName = FName("X");
 		
 		FCustomInput InY;
-        InY.InputName = FName("Y");
+		InY.InputName = FName("Y");
 		
 		CustomNode->Inputs[0].InputName = FName("color");
 		
@@ -88,26 +94,16 @@ void FDn2GameGridsModule::StartupModule()
 		UMaterialEditingLibrary::ConnectMaterialProperty(CustomNode,"",MP_EmissiveColor);
 		//UMaterialEditingLibrary::RecompileMaterial(GenGridMat);
 		
-		if(GenGridMat)
+		if(GenGridMat && Package)
 		{
-			UPackage* Package = GenGridMat->GetPackage();
-			if(Package)
-			{
-				//UObject* NewObject = StaticDuplicateObject(GenGridMat, Package);
-				Package->SetFolderName( TEXT("/Game/GridPluginAssets") );
-				//FSavePackageArgs SaveArgs;
-				const FString PackageName = Package->GetName();
-				const FString PackageFileName = "M_BoxGridDebug.M_BoxGridDebug";
-				UPackage::SavePackage(Package,nullptr, EObjectFlags::RF_Standalone,*PackageName);
-				//SavePackageHelper(Package,TEXT("/Game/GridPluginAssets/M_BoxGridDebug.M_BoxGridDebug"));
-				//UEditorLoadingAndSavingUtils::SavePackages({Package}, false);
-			}
+			FAssetRegistryModule::AssetCreated(GenGridMat);
+			Package->SetDirtyFlag(true);
+			FString FilePath = FString::Printf(TEXT("%s%s%s"), *AssetPath, *FString("M_BoxGridDebug"), *FPackageName::GetAssetPackageExtension());
+			UMaterialEditingLibrary::RecompileMaterial(GenGridMat);
+			bool bSuccess = UPackage::SavePackage(Package, GenGridMat, EObjectFlags::RF_Public | EObjectFlags::RF_Standalone, *FilePath);
 
+			UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSuccess ? TEXT("True") : TEXT("False"));
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Found BoxGrid debug material M_BoxGridDebug"));
 	}
 #endif
 }

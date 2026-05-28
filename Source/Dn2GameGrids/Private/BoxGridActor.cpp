@@ -52,6 +52,16 @@ ABoxGridActor::ABoxGridActor() : Super()
 		UE_LOG(LogTemp, Warning, TEXT("3rd... %s"), *GridMat->GetFName().ToString());
 	}*/
 
+	if (!PrimaryProcMeshComp->GetMaterial(0))
+	{
+		static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/GridChecker_Mat.GridChecker_Mat"));
+		
+		if (GridMatObj.Object)
+		{
+			PrimaryProcMeshComp->SetMaterial(0, GridMatObj.Object);
+		}
+	}
+	
     ABoxGridActor::PostUpdateGridSetup(false);
 }
 
@@ -177,80 +187,6 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 	//new code
 	if (PrimaryProcMeshComp)
 	{
-		/*
-		 * make our material via code if none is assigned in editor
-		 * this is editor only
-		 */
-#if WITH_EDITOR
-		if (!GridMat)
-		{
-			UMaterial* GenGridMat = NewObject<UMaterial>();
-			
-			UMaterialExpressionScalarParameter* XNode = Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionScalarParameter::StaticClass()));
-			XNode->ParameterName = FName("X");
-			
-			UMaterialExpressionScalarParameter* YNode = Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionScalarParameter::StaticClass()));
-			YNode->ParameterName = FName("Y");
-			
-			UMaterialExpressionTextureCoordinate* CoordUVNode = Cast<UMaterialExpressionTextureCoordinate>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionTextureCoordinate::StaticClass()));
-						
-			UMaterialExpressionConstant3Vector* Color1Node = Cast<UMaterialExpressionConstant3Vector>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionConstant3Vector::StaticClass()));
-			Color1Node->Constant = FLinearColor::Green;
-			
-			UMaterialExpressionVertexColor* VertexColor = Cast<UMaterialExpressionVertexColor>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionVertexColor::StaticClass()));
-			
-			UMaterialExpressionCustom* CustomNode = Cast<UMaterialExpressionCustom>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionCustom::StaticClass()));
-			FCustomInput InUV;
-            InUV.InputName = FName("UV");
-			
-            FCustomInput InX;
-            InX.InputName = FName("X");
-			
-			FCustomInput InY;
-            InY.InputName = FName("Y");
-			
-			CustomNode->Inputs[0].InputName = FName("color");
-			
-			CustomNode->Inputs.Add(InUV);
-			CustomNode->Inputs.Add(InX);
-			CustomNode->Inputs.Add(InY);
-			
-			FString ShaderCode = "float3 Color1 = float3(0.026241,0.043735,0.099899);";
-			ShaderCode.Append("float3 Color2 = float3(0.031896,0.116971,0.439657);");
-			ShaderCode.Append("float3 EdgeColor = float3(0.639216,0.141176,0.000000);");
-			ShaderCode.Append("float2 Extents = float2(X*0.5, Y*0.5);");
-			ShaderCode.Append("float2 CheckUV = frac(UV*Extents) - 0.5;");
-			ShaderCode.Append("float mask = step(0.0, CheckUV.x * CheckUV.y);");
-			ShaderCode.Append("float3 result = lerp(Color1,Color2,mask);");
-			ShaderCode.Append("float2 EdgeUV = frac(UV*(Extents*2)) - 0.5;");
-			ShaderCode.Append("float edge = step(0.48, EdgeUV.x);");
-			ShaderCode.Append("edge += saturate(step(0.48, EdgeUV.y));");
-			ShaderCode.Append("result = result*color;");
-			ShaderCode.Append("return lerp(result,EdgeColor, edge);");
-			
-			CustomNode->Code = ShaderCode;
-			
-			//UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,CustomNode);
-			UMaterialEditingLibrary::ConnectMaterialExpressions(CoordUVNode,"",CustomNode,"UV");
-			UMaterialEditingLibrary::ConnectMaterialExpressions(XNode,"",CustomNode,"X");
-			UMaterialEditingLibrary::ConnectMaterialExpressions(YNode,"",CustomNode,"Y");
-			UMaterialEditingLibrary::ConnectMaterialExpressions(VertexColor,"",CustomNode,"color");
-			UMaterialEditingLibrary::ConnectMaterialProperty(CustomNode,"",MP_EmissiveColor);
-			//UMaterialEditingLibrary::RecompileMaterial(GenGridMat);
-			//GenGridMat->ForceRecompileForRendering();
-			
-
-			
-			//if (GenGridMat)
-			//{
-				//GridMat = GenGridMat;
-			//}
-		}
-#endif
-	}
-	
-	if (PrimaryProcMeshComp)
-	{
 		TArray<FVector> Vertices;
 		Vertices.Add(FVector(0,0,0));
 		Vertices.Add(FVector(-(GetGridExtents().Y*CellSize),0,0));
@@ -270,7 +206,7 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 		//PrimaryProcMeshComp->ClearCollisionConvexMeshes();
 		//PrimaryProcMeshComp->AddCollisionConvexMesh(Vertices);
 		
-#if WITH_EDITOR
+
 		if (bUpdateMaterial)
 		{
 			if (!GridMatInst && GridMat)
@@ -288,7 +224,6 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 				PrimaryProcMeshComp->SetMaterial(0, GridMatInst);
 			}
 		}
-#endif
 	}
 	
 	//old code here
@@ -761,6 +696,20 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		
 		SecondaryProcMeshComp->ClearMeshSection(0);
 		SecondaryProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV0, colors,tangents, true);
+		
+		if (GridMatInst && SecondaryProcMeshComp)
+		{
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			SecondaryProcMeshComp->SetMaterial(0, GridMatInst);
+		}
+		else if (GridMat && SecondaryProcMeshComp)
+		{
+			GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			SecondaryProcMeshComp->SetMaterial(0, GridMatInst);
+		}
 	}
 	
 	if (bDrawBlockedAsWalls && SecondaryProcMeshComp)
@@ -806,10 +755,19 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 				SecondaryProcMeshComp->ClearMeshSection(1);
 				SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
 				
-				/*if (GridMatInst && SecondaryProcMeshComp)
+				if (GridMatInst && SecondaryProcMeshComp)
 				{
+					GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+					GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
 					SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
-				}*/
+				}
+				else if (GridMat && SecondaryProcMeshComp)
+				{
+					GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
+					GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+					GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+					SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
+				}
 			}
 		}
 	}
