@@ -234,7 +234,7 @@ TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 Tes
 	}
 
 	/* The pixel data in the resulting array is not in the same order as our cell array. so first we reorder them */
-	FColor* FormattedImageData = reinterpret_cast<FColor*>(Texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_ONLY));
+	FColor* FormattedImageData = reinterpret_cast<FColor*>(Texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_ONLY));
 
 	/* First we need the pixel count and the image's w & h */
 	int32 PixelCount = Texture->GetSizeX() * Texture->GetSizeY();
@@ -265,7 +265,7 @@ TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 Tes
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, colour, FString::Printf(TEXT("Color: %s"), *colour.ToString()));
 	}*/
 
-	Texture->PlatformData->Mips[0].BulkData.Unlock();
+	Texture->GetPlatformData()->Mips[0].BulkData.Unlock();
 
 	return PixelData;
 }
