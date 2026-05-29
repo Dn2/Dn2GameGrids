@@ -2,9 +2,7 @@
 
 #include "Dn2GameGrids.h"
 #include "GameplayTagsManager.h"
-#include "FileHelpers.h"
 #include "MaterialEditingLibrary.h"
-#include "PackageHelperFunctions.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionCustom.h"
@@ -29,7 +27,7 @@ void FDn2GameGridsModule::StartupModule()
 	
 	
 	// Try to load grid debug materials Dn2GameGrids/Content/Materials
-	UObject* Asset = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Dn2GameGrids/Content/Materials/M_BoxGridDebug.M_BoxGridDebug"));
+	UObject* Asset = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Dn2GameGrids/Materials/M_BoxGridDebug.M_BoxGridDebug"));
 	if (Asset == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BoxGrid debug material not found! Creating it now.."));
@@ -45,9 +43,11 @@ void FDn2GameGridsModule::StartupModule()
 		
 		UMaterialExpressionScalarParameter* XNode = Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionScalarParameter::StaticClass()));
 		XNode->ParameterName = FName("X");
+		XNode->DefaultValue = 8.0f;
 		
 		UMaterialExpressionScalarParameter* YNode = Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionScalarParameter::StaticClass()));
 		YNode->ParameterName = FName("Y");
+		YNode->DefaultValue = 8.0f;
 		
 		UMaterialExpressionTextureCoordinate* CoordUVNode = Cast<UMaterialExpressionTextureCoordinate>(UMaterialEditingLibrary::CreateMaterialExpression(GenGridMat,UMaterialExpressionTextureCoordinate::StaticClass()));
 					
@@ -82,7 +82,7 @@ void FDn2GameGridsModule::StartupModule()
 		ShaderCode.Append("float2 EdgeUV = frac(UV*(Extents*2)) - 0.5;");
 		ShaderCode.Append("float edge = step(0.48, EdgeUV.x);");
 		ShaderCode.Append("edge += saturate(step(0.48, EdgeUV.y));");
-		ShaderCode.Append("result = result*color;");
+		ShaderCode.Append("result = lerp(result, color, color.r);");
 		ShaderCode.Append("return lerp(result,EdgeColor, edge);");
 		
 		CustomNode->Code = ShaderCode;
