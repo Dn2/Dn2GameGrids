@@ -52,15 +52,16 @@ ABoxGridActor::ABoxGridActor() : Super()
 		UE_LOG(LogTemp, Warning, TEXT("3rd... %s"), *GridMat->GetFName().ToString());
 	}*/
 
-	if (!PrimaryProcMeshComp->GetMaterial(0))
+	if (bAutoGenerate && !PrimaryProcMeshComp->GetMaterial(0))
 	{
 		static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/M_BoxGridDebug.M_BoxGridDebug"));
 		
 		if (GridMatObj.Object)
 		{
+			GridMat = GridMatObj.Object;
 			PrimaryProcMeshComp->SetMaterial(0, GridMatObj.Object);
 		}
-	}
+	}/**/
 	
     ABoxGridActor::PostUpdateGridSetup(false);
 }
@@ -199,7 +200,7 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 		TArray<FVector2D> UV0 = { FVector2D(0,1),FVector2D(0,0), FVector2D(1,0), FVector2D(1,1) };
 		TArray<FProcMeshTangent> tangents;
 		TArray<FLinearColor> colors;
-		colors.Init(FLinearColor::White, Vertices.Num());
+		colors.Init(FLinearColor::Black, Vertices.Num());
 		
 		PrimaryProcMeshComp->ClearMeshSection(0);
 		PrimaryProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV0, colors,tangents, true);
@@ -212,15 +213,15 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 			if (!GridMatInst && GridMat)
 			{
 				GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
-				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
 
 				PrimaryProcMeshComp->SetMaterial(0, GridMatInst);
 			}
 			else if (GridMatInst)
 			{
-				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+				GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
+				GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
 				PrimaryProcMeshComp->SetMaterial(0, GridMatInst);
 			}
 		}
@@ -692,7 +693,7 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		TArray<FVector2D> UV0 = { FVector2D(0,1),FVector2D(0,0), FVector2D(1,0), FVector2D(1,1) };
 		TArray<FProcMeshTangent> tangents;
 		TArray<FLinearColor> colors;
-		colors.Init(FLinearColor::White, Vertices.Num());
+		colors.Init(FLinearColor::Black, Vertices.Num());
 		
 		SecondaryProcMeshComp->ClearMeshSection(0);
 		SecondaryProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV0, colors,tangents, true);
@@ -718,6 +719,12 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		{
 			WallHeight = CellSize;
 		}
+		//unused
+		if (WallWidth < 1.0f)
+		{
+			WallWidth = CellSize;
+		}
+		
 		
 		TArray<FVector> Vertices;
 		TArray<int> Triangles;

@@ -26,7 +26,9 @@ AGridActorBase::AGridActorBase()
 	SecondaryProcMeshComp = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("SecondaryProcComponent"));
 	SecondaryProcMeshComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-
+	
+	bAutoGenerate = true;
+	
 	if (GridMeshComp/* && GridMesh*/)
 	{
 		//GridMeshComp->SetStaticMesh(GridMesh);
