@@ -19,7 +19,6 @@
 #include "Components/BillboardComponent.h"
 #include "Dn2GameGridTypes.h"
 #include "CoreMinimal.h"
-#include "GridActorBase.h"
 #include "GameFramework/Actor.h"
 #include "GridActorBase.generated.h"
 
