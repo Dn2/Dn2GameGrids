@@ -54,7 +54,7 @@ ABoxGridActor::ABoxGridActor() : Super()
 
 	if (!PrimaryProcMeshComp->GetMaterial(0))
 	{
-		static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/GridChecker_Mat.GridChecker_Mat"));
+		static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/M_BoxGridDebug.M_BoxGridDebug"));
 		
 		if (GridMatObj.Object)
 		{
