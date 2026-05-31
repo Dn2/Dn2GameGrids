@@ -256,6 +256,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grid)
 	TArray<FCellInfo> GridArray;
 	
+	
+	/*
+	*	Desc
+	*/
+	//UPROPERTY(BlueprintReadWrite, Category = Grid)
+	//TArray<FCellInfo> GridArray;
+	
+		
 	/* Easy access to vertex that represent a plane of our cell. In world or local space */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
