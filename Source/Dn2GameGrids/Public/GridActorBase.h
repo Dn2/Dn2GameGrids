@@ -6,6 +6,7 @@
 */
 #pragma once
 
+#include "GridMapData.h"
 #include "MaterialEditingLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
@@ -35,7 +36,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAStarSearchEnd, const FAStarSea
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnObjGridLocationChanged, const UObject*, MovedObject, const UGridMovementComponent*, GridMovementComp,const FCellInfo, OutCellInfo, const FVector, CellWorldLocation, const bool, bIsDoneMoving);
 
 
-UCLASS()
+UCLASS(Abstract, meta = (Category = "GridGame", PrioritizeCategories = "Grid"))
 class DN2GAMEGRIDS_API AGridActorBase : public AActor
 {
 	GENERATED_BODY()
@@ -203,7 +204,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UProceduralMeshComponent* SecondaryProcMeshComp;
 
-
+	// If supplied, this will be used to populate the grid.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
+	UGridMapData* MapData;
+	
 	//Alignment enum not currently used but is meant to choose how to offset grid's 0,0 in relation to actors origin.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	EGridMeshAlignment MeshAlignment;
@@ -217,9 +221,9 @@ public:
 
 	//---------
 	//Should the actor generate a grid using GridExtents and DefaultCellSize
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid, meta=(EditCondition="!MapData"))
 	bool bAutoGenerate;
-
+	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid, meta = (AllowPrivateAccess = "true"))
 	FIntPoint GridExtents;
