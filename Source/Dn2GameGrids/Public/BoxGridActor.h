@@ -9,7 +9,7 @@
 #include "GridActorBase.h"
 #include "BoxGridActor.generated.h"
 
-UCLASS()
+UCLASS(meta = (Category = "GridGame", DisplayName = "Box Grid", PrioritizeCategories = "Grid"))
 class DN2GAMEGRIDS_API ABoxGridActor : public AGridActorBase
 {
 	GENERATED_BODY()
