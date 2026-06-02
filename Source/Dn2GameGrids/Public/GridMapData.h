@@ -21,11 +21,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	FIntPoint Extents;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
+	float CellSize;
+	
 	/*
 	*	Desc
 	*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
-	TMap<int32,bool> BlockedCells;
+	TSet<int32> BlockedCells;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	TMap<int32,FGameplayTagContainer> CellTags;

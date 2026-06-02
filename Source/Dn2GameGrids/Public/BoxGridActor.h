@@ -33,11 +33,14 @@ public:
 #endif
 
 	virtual bool UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGameplayTagContainer DefaultTags) override;
+	virtual bool UpdateGridFromAssetAsync(UGridMapData* GridData) override;
+	
 	virtual bool GetPathToGoalAsync(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilter, FGameplayTagContainer ExFilter, bool bConers) override;
 
 
-	//UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags) override;
+	
+	virtual TArray<FCellInfo> CreateGridFromAsset(UGridMapData* GridMapData) override;
 
 	virtual void PostUpdateGridSetup(bool bUpdateMaterial = true) override;
 
@@ -60,7 +63,7 @@ public:
 
 	virtual FAStarSearchResults AStarSearchToGoal(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners) override;
 
-	virtual TArray<FCellInfo> GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const;
+	virtual TArray<FCellInfo> GetCellNeighbors(FCellAddress Address, FGameplayTagContainer InFilters, FGameplayTagContainer ExFilters, bool bCorners = true) const override;
 
 
 
@@ -98,16 +101,18 @@ class FUpdateGridTask : public FNonAbandonableTask
 	friend class FAutoDeleteAsyncTask<FUpdateGridTask>;
 
 public:
-	FUpdateGridTask(ABoxGridActor* gridActor, FIntPoint gridSize, float cellSize=100) :
+	FUpdateGridTask(ABoxGridActor* gridActor, FIntPoint gridSize, float cellSize, FGameplayTagContainer defaultTags) :
 		GridActor(gridActor),
 		GridSize(gridSize),
-		GridCellSize(cellSize)
+		GridCellSize(cellSize),
+		GridDefaultTags(defaultTags)
 	{}
 
 protected:
 	ABoxGridActor* GridActor;
 	FIntPoint GridSize;
 	float GridCellSize;
+	FGameplayTagContainer GridDefaultTags;
 
 	void DoWork()
 	{
@@ -116,7 +121,7 @@ protected:
 			UE_LOG(LogTemp, Warning, TEXT("Running from async..."));
 
 			//create a grid array of cells
-			TArray<FCellInfo> NewCellArray = GridActor->CreateEmptyGrid(GridSize.X, GridSize.Y, FGameplayTagContainer::EmptyContainer);
+			TArray<FCellInfo> NewCellArray = GridActor->CreateEmptyGrid(GridSize.X, GridSize.Y, GridDefaultTags);
 
 			//Store assign it to our actor
 			GridActor->GridArray = NewCellArray;
@@ -130,6 +135,45 @@ protected:
 	FORCEINLINE TStatId GetStatId() const
 	{
 		RETURN_QUICK_DECLARE_CYCLE_STAT(FUpdateGridTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+};
+
+
+class FUpdateGridFromAssetTask : FNonAbandonableTask
+{
+	friend class FAutoDeleteAsyncTask<FUpdateGridFromAssetTask>;
+
+public:
+	FUpdateGridFromAssetTask(ABoxGridActor* gridActor, UGridMapData* gridData) :
+		GridActor(gridActor),
+		GridData(gridData)
+	{}
+
+protected:
+	ABoxGridActor* GridActor;
+	UGridMapData* GridData;
+
+	void DoWork()
+	{
+		if(GridActor && GridData)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Running from async..."));
+
+			//create a grid array of cells (from our asset)
+			TArray<FCellInfo> NewCellArray = GridActor->CreateGridFromAsset(GridData);
+			
+			//Store assign it to our actor
+			GridActor->GridArray = NewCellArray;
+			GridActor->SetGridExtents(GridData->Extents);
+			GridActor->CellSize = GridData->CellSize;
+
+			//Broadcast our event so we can do post grid creation stuff
+			GridActor->OnUpdateGridDelCPP.Broadcast(GridData->Extents, GridActor->GridArray, GridData->CellSize);
+		}
+	}
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FUpdateGridFromAssetTask, STATGROUP_ThreadPoolAsyncTasks);
 	}
 };
 

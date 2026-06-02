@@ -21,10 +21,10 @@ void FDn2GameGridsModule::StartupModule()
 	/*
 	*	Add GameplayTags that the plugin will always assume is present for making empty grids.
 	*	Only remove or edit these if you're changing how ABoxGridActor works.
-	*/
+	
 	UGameplayTagsManager::Get().AddNativeGameplayTag("Cell.Nav.Void");
 	UGameplayTagsManager::Get().AddNativeGameplayTag("Cell.Nav.Blocked");
-	
+	*/
 	
 	// Try to load grid debug materials Dn2GameGrids/Content/Materials
 	UObject* Asset = StaticLoadObject(UObject::StaticClass(), nullptr, TEXT("/Dn2GameGrids/Materials/M_BoxGridDebug.M_BoxGridDebug"));

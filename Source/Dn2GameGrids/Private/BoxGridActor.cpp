@@ -71,10 +71,14 @@ void ABoxGridActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (bAutoGenerate)
+	if (MapData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Auto-Generating from asset..."));
+		UpdateGridFromAssetAsync(MapData);
+	}
+	else if (bAutoGenerate)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Auto-Generating..."));
-		//(new FAutoDeleteAsyncTask<FUpdateGridTask>(this, FIntPoint(10000,10000), 100))->StartBackgroundTask();
 		UpdateGridAsync(GetGridExtents(), CellSize, DefaultCellTags);
 	}
 }
@@ -98,7 +102,7 @@ void ABoxGridActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
 {
 	Super::PostEditChangeProperty(e);
 
-	if (e.GetPropertyName().ToString() == "X"|| "Y" || "DefaultGridExtents" || "CellSize")
+	if (e.GetPropertyName().ToString() == "X"|| "Y" || "DefaultGridExtents" || "CellSize" || "MapData")
 	{
 		PostUpdateGridSetup();
 	}
@@ -117,8 +121,22 @@ bool ABoxGridActor::UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGame
 	//else do ya thing (start the async task, create the new grid and update values)
 	UE_LOG(LogTemp, Warning, TEXT("Updating Grid..."));
 	SetBusy(true);
-	(new FAutoDeleteAsyncTask<FUpdateGridTask>(this, Extents, GridCellSize))->StartBackgroundTask();
+	(new FAutoDeleteAsyncTask<FUpdateGridTask>(this, Extents, GridCellSize, DefaultTags))->StartBackgroundTask();
 
+	return true;
+}
+
+bool ABoxGridActor::UpdateGridFromAssetAsync(UGridMapData* GridData)
+{
+	if (IsBusy() || !GridData)
+	{
+		return false;
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Updating Grid from asset..."));
+	SetBusy(true);
+	(new FAutoDeleteAsyncTask<FUpdateGridFromAssetTask>(this, GridData))->StartBackgroundTask();
+	
 	return true;
 }
 
@@ -182,10 +200,42 @@ TArray<FCellInfo> ABoxGridActor::CreateEmptyGrid(int32 XExtent, int32 YExtent, F
 	return NewGridArray;
 }
 
+TArray<FCellInfo> ABoxGridActor::CreateGridFromAsset(UGridMapData* GridMapData)
+{
+	if (!GridMapData)
+	{
+		return TArray<FCellInfo>();
+	}
+	
+	TArray<FCellInfo> NewGridArray = CreateEmptyGrid(GridMapData->Extents.X, GridMapData->Extents.Y, FGameplayTagContainer::EmptyContainer);
+	
+	//Set blocked
+	for (auto CellIndex : GridMapData->BlockedCells)
+	{
+		if (NewGridArray.IsValidIndex(CellIndex))
+		{
+			NewGridArray[CellIndex].SetBlocked(true);
+		}
+	}
+	
+	//Set Tags
+	for (auto Cell : GridMapData->CellTags)
+	{
+		if (NewGridArray.IsValidIndex(Cell.Key))
+		{
+			NewGridArray[Cell.Key].CellTags = Cell.Value;
+		}
+	}
+	
+	
+	return NewGridArray;
+}
+
 
 void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 {
 	//new code
+	
 	if (PrimaryProcMeshComp)
 	{
 		TArray<FVector> Vertices;
@@ -758,24 +808,24 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 				Tris.Append( { 6+VertCount, 7+VertCount, 1+VertCount, 6+VertCount, 1+VertCount, 0+VertCount } ); /*back*/
 				Tris.Append( { 0+VertCount, 1+VertCount, 2+VertCount, 1+VertCount, 3+VertCount, 2+VertCount } ); /*left*/
 				Triangles.Append(Tris);
-			
-				SecondaryProcMeshComp->ClearMeshSection(1);
-				SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
-				
-				if (GridMatInst && SecondaryProcMeshComp)
-				{
-					GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-					GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-					SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
-				}
-				else if (GridMat && SecondaryProcMeshComp)
-				{
-					GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
-					GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-					GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-					SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
-				}
 			}
+		}
+		
+		SecondaryProcMeshComp->ClearMeshSection(1);
+		SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
+				
+		if (GridMatInst && SecondaryProcMeshComp)
+		{
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
+		}
+		else if (GridMat && SecondaryProcMeshComp)
+		{
+			GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
 		}
 	}
 }

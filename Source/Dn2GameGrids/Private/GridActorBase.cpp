@@ -81,12 +81,22 @@ bool AGridActorBase::UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGam
 	return false;
 }
 
+bool AGridActorBase::UpdateGridFromAssetAsync(UGridMapData* GridMapData)
+{
+	return false;
+}
+
 bool AGridActorBase::GetPathToGoalAsync(FCellAddress Start, FCellAddress Goal, FGameplayTagContainer InFilter, FGameplayTagContainer ExFilter, bool bConers)
 {
 	return false;
 }
 
 TArray<FCellInfo> AGridActorBase::CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags)
+{
+	return TArray<FCellInfo>();
+}
+
+TArray<FCellInfo> AGridActorBase::CreateGridFromAsset(UGridMapData* GridMapData)
 {
 	return TArray<FCellInfo>();
 }
@@ -176,11 +186,23 @@ TArray<FCellInfo> AGridActorBase::GetWalkableCells(TArray<FCellInfo> InCellArray
 
 FIntPoint AGridActorBase::GetGridExtents() const
 {
+	if (MapData)
+	{
+		return MapData->Extents;
+	}
+	
 	return GridExtents;
 }
 
 void AGridActorBase::SetGridExtents(FIntPoint Extents)
 {
+	//TODO: this feels messy.
+	/*if (MapData)
+	{
+		GridExtents = MapData->Extents;
+	}*/
+	
+	
 	if (Extents.X < 2)
 	{
 		Extents.X = DefaultGridExtents.X;

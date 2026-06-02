@@ -97,6 +97,12 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
 	virtual bool UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGameplayTagContainer DefaultTags);
+	
+	/*
+	*	Does the same as the above but uses a UGridMapData asset to populate the grid
+	*/
+	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
+	virtual bool UpdateGridFromAssetAsync(UGridMapData* GridMapData);
 
 	/*
 	*	Where we will call the subclass's version of an FNonAbandonableTask that given a start and goal address will
@@ -116,6 +122,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = Grid, meta = (AutoCreateRefTerm = "DefaultTags"))
 	virtual TArray<FCellInfo> CreateEmptyGrid(int32 XExtent, int32 YExtent, FGameplayTagContainer DefaultTags);
+	
+	/*
+	*	Where we will create the array of our cells for the grid from an asset. Creates an array of
+	*	FCellInfo with their coordinates as FCellAddress.
+	*/
+	UFUNCTION(BlueprintCallable, Category = Grid)
+	virtual TArray<FCellInfo> CreateGridFromAsset(UGridMapData* GridMapData);
 
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual void PostUpdateGridSetup(bool bUpdateMaterial=true);
@@ -175,12 +188,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Grid)
 	virtual TArray<FCellInfo> GetWalkableCells(TArray<FCellInfo> InCellArray) const;
 
+	/*
+    	will return MapData->Extents if MapData is not null, otherwise returns GridExtents
+    */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Grid)
 	FIntPoint GetGridExtents() const;
 
 	/*
 		Never call this function on its own as you should never really need to set GridExtents manually.
-		Use UpdateGridAsync() or CreateEmptyGrid to create a new grid.
+		Use UpdateGridAsync() or CreateEmptyGrid type functions to create a new grid.
 	*/
 	void SetGridExtents(FIntPoint Extents);
 
@@ -204,7 +220,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UProceduralMeshComponent* SecondaryProcMeshComp;
 
-	// If supplied, this will be used to populate the grid.
+	// If supplied, this will be used to populate the grid, ignoring other input.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
 	UGridMapData* MapData;
 	
