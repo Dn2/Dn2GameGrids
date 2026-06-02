@@ -18,15 +18,15 @@ class DN2GAMEGRIDS_API UGridMapData : public UPrimaryDataAsset
 public:
 	//UGridMapData();
 	 
-	UPROPERTY(BlueprintReadWrite, Category = Grid)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	FIntPoint Extents;
 	
 	/*
 	*	Desc
 	*/
-	UPROPERTY(BlueprintReadWrite, Category = Grid)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	TMap<int32,bool> BlockedCells;
 	
-	UPROPERTY(BlueprintReadWrite, Category = Grid)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Grid)
 	TMap<int32,FGameplayTagContainer> CellTags;
 };
