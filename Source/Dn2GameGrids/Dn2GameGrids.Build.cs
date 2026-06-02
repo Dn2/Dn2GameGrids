@@ -39,6 +39,7 @@ public class Dn2GameGrids : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"GameplayTags",
 				"ProceduralMeshComponent",
 				"MaterialEditor",
 				"UnrealEd",
