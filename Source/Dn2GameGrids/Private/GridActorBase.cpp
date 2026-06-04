@@ -232,7 +232,7 @@ TArray<FVector> AGridActorBase::GetCellVertexArray(FCellAddress InAddress, bool 
 	return TArray<FVector>();
 }
 
-void AGridActorBase::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight, float WallWidth)
+void AGridActorBase::BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight, float WallWidth)
 {
 }
 

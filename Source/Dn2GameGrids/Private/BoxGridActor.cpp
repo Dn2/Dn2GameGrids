@@ -725,11 +725,17 @@ TArray<FVector> ABoxGridActor::GetCellVertexArray(FCellAddress InAddress, bool b
 	return VertexArray;
 }
 
-void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight, float WallWidth)
+void ABoxGridActor::BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight, float WallWidth)
 {
 	//Super::BuildDebugProcMesh(bDrawGrid, bDrawBlockedAsWalls, WallFilters, WallHeight, WallWidth);
+	// exit if no supplied procedural mesh
+	if (!ProcMeshComp)
+	{
+		return;
+	}
 	
-	if (bDrawGrid && SecondaryProcMeshComp)
+	
+	if (bDrawGrid)
 	{
 		TArray<FVector> Vertices;
 		Vertices.Add(FVector(0,0,0));
@@ -745,25 +751,25 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 		TArray<FLinearColor> colors;
 		colors.Init(FLinearColor::Black, Vertices.Num());
 		
-		SecondaryProcMeshComp->ClearMeshSection(0);
-		SecondaryProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV0, colors,tangents, true);
+		ProcMeshComp->ClearMeshSection(98);
+		ProcMeshComp->CreateMeshSection_LinearColor(98, Vertices, Triangles, Normals, UV0, colors,tangents, true);
 		
-		if (GridMatInst && SecondaryProcMeshComp)
+		if (GridMatInst)
 		{
 			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
 			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-			SecondaryProcMeshComp->SetMaterial(0, GridMatInst);
+			ProcMeshComp->SetMaterial(98, GridMatInst);
 		}
-		else if (GridMat && SecondaryProcMeshComp)
+		else if (GridMat)
 		{
 			GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
 			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
 			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-			SecondaryProcMeshComp->SetMaterial(0, GridMatInst);
+			ProcMeshComp->SetMaterial(98, GridMatInst);
 		}
 	}
 	
-	if (bDrawBlockedAsWalls && SecondaryProcMeshComp)
+	if (bDrawBlockedAsWalls)
 	{
 		if (WallHeight < 1.0f)
 		{
@@ -811,21 +817,21 @@ void ABoxGridActor::BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls,
 			}
 		}
 		
-		SecondaryProcMeshComp->ClearMeshSection(1);
-		SecondaryProcMeshComp->CreateMeshSection_LinearColor(1, Vertices, Triangles, Normals, UV0, colors,tangents, false);
+		ProcMeshComp->ClearMeshSection(99);
+		ProcMeshComp->CreateMeshSection_LinearColor(99, Vertices, Triangles, Normals, UV0, colors,tangents, false);
 				
-		if (GridMatInst && SecondaryProcMeshComp)
+		if (GridMatInst)
 		{
 			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
 			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-			SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
+			ProcMeshComp->SetMaterial(99, GridMatInst);
 		}
-		else if (GridMat && SecondaryProcMeshComp)
+		else if (GridMat)
 		{
 			GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
 			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
 			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
-			SecondaryProcMeshComp->SetMaterial(1, GridMatInst);
+			ProcMeshComp->SetMaterial(99, GridMatInst);
 		}
 	}
 }

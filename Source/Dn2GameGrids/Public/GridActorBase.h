@@ -210,17 +210,26 @@ public:
 	UPROPERTY()
 	UBillboardComponent* SpriteComponent;
 
-	//Mesh component for be visual rep for the grid and trace collisions for world locations <> grid address conversions
+	/* PrimaryProcMeshComp is now the debug visual & trace collision component. This mesh comp is now unused. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UStaticMeshComponent* GridMeshComp;
 
+	/*
+	 *	Used for trace collision and debug visual representation of the grid.
+	 *	e.g. for ABoxGridActor, we use it to generate a quad for the entire grid
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UProceduralMeshComponent* PrimaryProcMeshComp;
 
+	/*
+	 *	f
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Grid)
 	UProceduralMeshComponent* SecondaryProcMeshComp;
 
-	// If supplied, this will be used to populate the grid, ignoring other input.
+	/* 
+	 *	If supplied, this will be used to populate the grid, ignoring other input.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grid)
 	UGridMapData* MapData;
 	
@@ -288,9 +297,14 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
 	virtual TArray<FVector> GetCellVertexArray(FCellAddress InAddress, bool bLocalSpace=true);
 
-	/* Easy access to vertex that represent a plane of our cell. In world or local space */
+	/*
+	*	Build a mesh to visualize the grid, walls and all.
+	*	Vertex colors for walls are red, otherwise they will be white.
+	*	Grid Section = 98
+	*	Wall Section = 99
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Grid|Gen")
-	virtual void BuildDebugProcMesh(bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight=0.0f, float WallWidth=0.0f);
+	virtual void BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, bool bDrawGrid, bool bDrawBlockedAsWalls, FGameplayTagContainer WallFilters, float WallHeight=0.0f, float WallWidth=0.0f);
 	
 	/* Returns a normal pointing in the direction of the target cell from the start cell */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Grid|Gen")
