@@ -7,10 +7,10 @@
 #pragma once
 
 #include "GridMapData.h"
-#include "MaterialEditingLibrary.h"
+//#include "MaterialEditingLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
-#include "ProceduralMeshComponent.h"
+//#include "ProceduralMeshComponent.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/Texture2D.h"
@@ -25,6 +25,7 @@
 
 // Forward Declarations
 class AGridActorBase;
+class UProceduralMeshComponent;
 //class UMaterial;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUpdateGrid_Internal, const FIntPoint&, gridExtents, const TArray<FCellInfo>&, OutCellArray, const float, OutCellSize);
@@ -44,23 +45,29 @@ class DN2GAMEGRIDS_API AGridActorBase : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGridActorBase();
+	
+	virtual void BeginDestroy() override;
+	
+	FDelegateHandle MapChangedHandle;
+	
+	virtual void OnGridMapDataChanged();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	//Set bBusy indicating if this actor is able to run async grid creation or path-finding task at this time
 	void SetBusy(bool bIsBusy);
-
+	
+	
+public:	
 	/*
-	*	My dirty way of only letting one async function run once at a time so that we aren't trying to
+	*	Only letting one async function run once at a time so that we aren't trying to
 	*	navigate the grid while creating a new one.
 	*/
 	bool IsBusy();
 
-
-
-public:	
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

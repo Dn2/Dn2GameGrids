@@ -2,12 +2,15 @@
 
 #pragma once
 
+#include "ProceduralMeshComponent.h"
 #include "Async/AsyncWork.h"
 //#include "Dn2GameGridTypes.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GridActorBase.h"
 #include "BoxGridActor.generated.h"
+
+//class UProceduralMeshComponent;
 
 UCLASS(meta = (Category = "GridGame", DisplayName = "Box Grid", PrioritizeCategories = "Grid"))
 class DN2GAMEGRIDS_API ABoxGridActor : public AGridActorBase
@@ -29,7 +32,7 @@ public:
 	//virtual void OnConstruction(const FTransform& Transform) override;
 
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
 	virtual bool UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGameplayTagContainer DefaultTags) override;
@@ -73,6 +76,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Grid/**/)
 	void OnUpdateGrid(const FIntPoint& OutGridExtents, const TArray<FCellInfo>& OutCellArray, const float OutCellSize);
 
+	virtual void OnGridMapDataChanged() override;
+	
 	UFUNCTION()
 	virtual void OnAStarSearchEnd_Internal(const FAStarSearchResults& AStarSearchResults, const bool GoalFound, const int32 NumberOfCells, const FCellAddress& LastCellFound);
 

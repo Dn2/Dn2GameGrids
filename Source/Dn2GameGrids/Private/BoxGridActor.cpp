@@ -12,6 +12,7 @@
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 
+//class UProceduralMeshComponent;
 
 // Sets default values
 ABoxGridActor::ABoxGridActor() : Super()
@@ -27,7 +28,8 @@ ABoxGridActor::ABoxGridActor() : Super()
 
 	OnObjGridLocChangedCPP.AddDynamic(this, &ABoxGridActor::OnGridLocChanged_Internal);
 	OnObjGridLocChangedBP.AddDynamic(this, &ABoxGridActor::OnGridLocChanged);
-
+	
+	
 	//load default grid mesh and material
 	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> GridMeshObj(TEXT("/Dn2GameGrids/StaticMeshes/Gridx100.Gridx100"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> GridMatObj(TEXT("/Dn2GameGrids/Materials/GridChecker_Mat.GridChecker_Mat"));
@@ -98,12 +100,17 @@ void ABoxGridActor::Tick(float DeltaTime)
 
 
 #if WITH_EDITOR
-void ABoxGridActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
+void ABoxGridActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeProperty(e);
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	if (e.GetPropertyName().ToString() == "X"|| "Y" || "DefaultGridExtents" || "CellSize" || "MapData")
+	if (PropertyChangedEvent.GetPropertyName().ToString() == "X"|| "Y" || "DefaultGridExtents" || "CellSize" || "MapData")
 	{
+		if (PropertyChangedEvent.GetPropertyName().ToString() == "MapData" && MapData)
+		{
+			//MapChangedHandle = MapData->OnChanged.AddUObject(this, &AGridActorBase::OnGridMapDataChanged);
+		}
+		
 		PostUpdateGridSetup();
 	}
 }
@@ -240,9 +247,9 @@ void ABoxGridActor::PostUpdateGridSetup(bool bUpdateMaterial)
 	{
 		TArray<FVector> Vertices;
 		Vertices.Add(FVector(0,0,0));
-		Vertices.Add(FVector(-(GetGridExtents().Y*CellSize),0,0));
-		Vertices.Add(FVector(-(GetGridExtents().Y*CellSize), GetGridExtents().X*CellSize,0));
-		Vertices.Add(FVector(0,GetGridExtents().X*CellSize,0));
+		Vertices.Add(FVector(-(GetGridExtents().Y*GetCellSize()),0,0));
+		Vertices.Add(FVector(-(GetGridExtents().Y*GetCellSize()), GetGridExtents().X*GetCellSize(),0));
+		Vertices.Add(FVector(0,GetGridExtents().X*GetCellSize(),0));
 		
 		TArray<int32> Triangles = {0,1,2,0,2,3};
 		
@@ -319,8 +326,8 @@ FVector ABoxGridActor::GetCellLocationFromAddress(FCellAddress Address, bool bLo
 	//Actor's origin will be 0,0 of our grid
 	FVector Loc = (bLocalSpace ? FVector(0,0,0) : GetActorLocation());
 
-	float Y = Loc.Y + (Address.X + 1) * CellSize - CellSize * 0.5f;
-	float X = Loc.X - ((Address.Y + 1) * CellSize - CellSize * 0.5f);
+	float Y = Loc.Y + (Address.X + 1) * GetCellSize() - GetCellSize() * 0.5f;
+	float X = Loc.X - ((Address.Y + 1) * GetCellSize() - GetCellSize() * 0.5f);
 
 	return FVector(X, Y, Loc.Z);
 }
@@ -332,15 +339,15 @@ FCellAddress ABoxGridActor::GetCellAddressFromLocation(FVector Location)
 		We check here for validity
 	*/
 	FVector ActLoc = GetActorLocation();
-	if (Location.Y < ActLoc.Y || Location.Y > ActLoc.Y + (GetGridExtents().X*CellSize) || Location.X > ActLoc.X || Location.X < ActLoc.X - (GetGridExtents().Y*CellSize))
+	if (Location.Y < ActLoc.Y || Location.Y > ActLoc.Y + (GetGridExtents().X*GetCellSize()) || Location.X > ActLoc.X || Location.X < ActLoc.X - (GetGridExtents().Y*GetCellSize()))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < CellSize * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
+		//UE_LOG(LogTemp, Warning, TEXT("Exited from 1st check: %s"), (Location.X < GetCellSize() * GetGridExtents().X ? TEXT("X1 true") : TEXT("X1 false")) );
 		return FCellAddress(-1, -1);
 	}
 
 	FCellAddress Address;
-	Address.X = FMath::TruncToFloat(FMath::Abs(Location.Y - ActLoc.Y) / CellSize);
-	Address.Y = FMath::TruncToFloat(FMath::Abs(Location.X - ActLoc.X) / CellSize);
+	Address.X = FMath::TruncToFloat(FMath::Abs(Location.Y - ActLoc.Y) / GetCellSize());
+	Address.Y = FMath::TruncToFloat(FMath::Abs(Location.X - ActLoc.X) / GetCellSize());
 
 	//check for out of range
 	if (Address.X < 0 || Address.Y < 0 || Address.X > GetGridExtents().X-1 || Address.Y > GetGridExtents().Y-1)
@@ -653,6 +660,18 @@ void ABoxGridActor::OnUpdateGrid_Internal(const FIntPoint& OutGridExtents, const
 	});
 }
 
+void ABoxGridActor::OnGridMapDataChanged()
+{
+	//remove this for grid editor
+	Super::OnGridMapDataChanged();
+	
+	if (MapData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Auto-Generating from asset..."));
+		PostUpdateGridSetup();
+	}
+}
+
 void ABoxGridActor::OnAStarSearchEnd_Internal(const FAStarSearchResults& AStarSearchResults, const bool GoalFound, const int32 NumberOfCells, const FCellAddress& LastCellFound)
 {
 	AsyncTask(ENamedThreads::GameThread, [this, AStarSearchResults, GoalFound, NumberOfCells, LastCellFound]()
@@ -696,7 +715,7 @@ TArray<FVector> ABoxGridActor::GetCellVertexArray(FCellAddress InAddress, bool b
 	}
 
 
-	float Offset = (CellSize / 2);
+	float Offset = (GetCellSize() / 2);
 	//Box means squares, so lets add four vertex positions to the array, counter clockwise
 
 	FVector VertLoc;
@@ -739,9 +758,9 @@ void ABoxGridActor::BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, b
 	{
 		TArray<FVector> Vertices;
 		Vertices.Add(FVector(0,0,0));
-		Vertices.Add(FVector(-(GetGridExtents().Y*CellSize),0,0));
-		Vertices.Add(FVector(-(GetGridExtents().Y*CellSize), GetGridExtents().X*CellSize,0));
-		Vertices.Add(FVector(0,GetGridExtents().X*CellSize,0));
+		Vertices.Add(FVector(-(GetGridExtents().Y*GetCellSize()),0,0));
+		Vertices.Add(FVector(-(GetGridExtents().Y*GetCellSize()), GetGridExtents().X*GetCellSize(),0));
+		Vertices.Add(FVector(0,GetGridExtents().X*GetCellSize(),0));
 		
 		TArray<int32> Triangles = {0,1,2,0,2,3};
 		
@@ -773,12 +792,12 @@ void ABoxGridActor::BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, b
 	{
 		if (WallHeight < 1.0f)
 		{
-			WallHeight = CellSize;
+			WallHeight = GetCellSize();
 		}
 		//unused
 		if (WallWidth < 1.0f)
 		{
-			WallWidth = CellSize;
+			WallWidth = GetCellSize();
 		}
 		
 		

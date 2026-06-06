@@ -4,8 +4,10 @@
 #include "GridActorBase.h"
 #include "TextureResource.h"
 
+class UProceduralMeshComponent;
+
 // Sets default values
-AGridActorBase::AGridActorBase()
+AGridActorBase::AGridActorBase() : Super()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -49,13 +51,19 @@ AGridActorBase::AGridActorBase()
 	if (GridExtents.Y < 2)
 	{
 		GridExtents.Y = DefaultGridExtents.Y;
-	}
+	}	
 }
 
 // Called when the game starts or when spawned
 void AGridActorBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
+
+void AGridActorBase::BeginDestroy()
+{
+	Super::BeginDestroy();
 	
 }
 
@@ -222,8 +230,19 @@ void AGridActorBase::ImageToLevel(UTexture2D* LayoutTexture, TMap<FColor, FName>
 
 }
 
+void AGridActorBase::OnGridMapDataChanged()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("GridMapData Updated!!"));
+}
+
+
 float AGridActorBase::GetCellSize()
 {
+	if (MapData)
+	{
+		return MapData->CellSize;
+	}
+	
 	return CellSize;
 }
 

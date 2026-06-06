@@ -40,8 +40,8 @@ public class Dn2GameGrids : ModuleRules
 				"Slate",
 				"SlateCore",
 				"ProceduralMeshComponent",
-				"MaterialEditor",
-				"UnrealEd",
+				//"MaterialEditor",
+				//"UnrealEd",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
