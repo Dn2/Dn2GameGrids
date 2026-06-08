@@ -1,4 +1,5 @@
 #include "Dn2GameGridsEditorModule.h"
+
 #include "GameplayTagsManager.h"
 #include "MaterialEditingLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -204,6 +205,17 @@ void FDn2GameGridsEditorModule::CreateAndSaveMaterialPackage()
 		bool bSuccess = UPackage::SavePackage(Package, GenGridMat, EObjectFlags::RF_Public | EObjectFlags::RF_Standalone, *FilePath);
 
 		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSuccess ? TEXT("True") : TEXT("False"));
+		
+		auto clicked = FMessageDialog::Open( EAppMsgType::Ok, FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required to start using Dn2GameGrids. \n \n You can manually restart the editor on your own."),nullptr);
+		/*UEditorDialogLibrary::ShowMessage(
+			FText::FromString("Editor Restart Needed"),
+			FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required To start using Dn2GameGrids. Click No to manually restart editor on your own."),
+			EAppMsgType::Ok);*/
+		if (clicked == EAppReturnType::Ok)
+		{
+			FUnrealEdMisc::Get().RestartEditor(true);
+		}
+		
 	}
 }
 
