@@ -4,6 +4,7 @@
 #include "GameplayTagsManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Async/Async.h"
+#include "Engine/AssetManager.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionCustom.h"
@@ -93,10 +94,19 @@ void ABoxGridActor::Tick(float DeltaTime)
 }
 
 
-/*void ABoxGridActor::OnConstruction(const FTransform& Transform)
+void ABoxGridActor::OnConstruction(const FTransform& Transform)
 {
-
-}*/
+	Super::OnConstruction(Transform);
+	PostUpdateGridSetup();
+	UE_LOG(LogTemp, Warning, TEXT("OnConstruction called"));
+	
+#if WITH_EDITOR
+	if (MapData && !MapData->OnChanged.IsBoundToObject(this))
+	{
+		MapData->BindOnChanged(this);
+	}
+#endif
+}
 
 
 #if WITH_EDITOR
@@ -108,10 +118,21 @@ void ABoxGridActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 	{
 		if (PropertyChangedEvent.GetPropertyName().ToString() == "MapData" && MapData)
 		{
-			//MapChangedHandle = MapData->OnChanged.AddUObject(this, &AGridActorBase::OnGridMapDataChanged);
+			//MapData->OnChanged.Remove(MapChangedHandle); preeditchange OnChanged.Remove(MapChangedHandle);
+			MapChangedHandle = MapData->OnChanged.AddUObject(this, &AGridActorBase::OnGridMapDataChanged);
 		}
 		
 		PostUpdateGridSetup();
+	}
+}
+
+void ABoxGridActor::PreEditChange(FProperty* PropertyThatWillChange)
+{
+	Super::PreEditChange(PropertyThatWillChange);
+	
+	if (PropertyThatWillChange->NamePrivate.ToString() == "MapData" && MapData)
+	{
+		MapData->OnChanged.Remove(MapChangedHandle);
 	}
 }
 #endif
@@ -667,7 +688,7 @@ void ABoxGridActor::OnGridMapDataChanged()
 	
 	if (MapData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Auto-Generating from asset..."));
+		UE_LOG(LogTemp, Warning, TEXT("OnGridMapDataChanged: calling PostUpdateGridSetup from Boxactor"));
 		PostUpdateGridSetup();
 	}
 }
@@ -841,15 +862,15 @@ void ABoxGridActor::BuildDebugProcMesh(UProceduralMeshComponent* ProcMeshComp, b
 				
 		if (GridMatInst)
 		{
-			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
 			ProcMeshComp->SetMaterial(99, GridMatInst);
 		}
 		else if (GridMat)
 		{
 			GridMatInst = UMaterialInstanceDynamic::Create(GridMat, this);
-			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().Y);
-			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().X);
+			GridMatInst->SetScalarParameterValue(FName("X"), GetGridExtents().X);
+			GridMatInst->SetScalarParameterValue(FName("Y"), GetGridExtents().Y);
 			ProcMeshComp->SetMaterial(99, GridMatInst);
 		}
 	}

@@ -21,6 +21,14 @@ void UGridMapData::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	OnChanged.Broadcast();
 	UE_LOG(LogTemp, Warning, TEXT("PostEditChangeProperty from GridMapData (OnChanged.Broadcast)!!"));
 }
+
+void UGridMapData::BindOnChanged(AGridActorBase* GridActor)
+{
+	if (GridActor)
+	{
+		GridActor->MapChangedHandle = OnChanged.AddUObject(GridActor, &AGridActorBase::OnGridMapDataChanged);
+	}
+}
 #endif
 
 #if WITH_EDITORONLY_DATA

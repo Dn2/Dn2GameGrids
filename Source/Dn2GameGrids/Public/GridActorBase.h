@@ -51,6 +51,8 @@ public:
 	FDelegateHandle MapChangedHandle;
 	
 	virtual void OnGridMapDataChanged();
+	
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	// Called when the game starts or when spawned

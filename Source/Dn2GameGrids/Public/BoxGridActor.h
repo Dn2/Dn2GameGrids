@@ -29,10 +29,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PreEditChange(FProperty* PropertyThatWillChange) override;
 #endif
 
 	virtual bool UpdateGridAsync(FIntPoint Extents, float GridCellSize, FGameplayTagContainer DefaultTags) override;

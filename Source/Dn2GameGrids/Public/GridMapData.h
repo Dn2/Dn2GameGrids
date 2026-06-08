@@ -8,7 +8,7 @@
 #include "Engine/DataAsset.h"
 #include "GridMapData.generated.h"
 
-//class AGridActorBase;
+class AGridActorBase;
 
 DECLARE_EVENT( UGridMapData, FOnChanged );
 /**
@@ -24,6 +24,7 @@ public:
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty( FPropertyChangedEvent & PropertyChangedEvent ) override;
+	void BindOnChanged( AGridActorBase* GridActor );
 #endif
 	
 	FOnChanged OnChanged;

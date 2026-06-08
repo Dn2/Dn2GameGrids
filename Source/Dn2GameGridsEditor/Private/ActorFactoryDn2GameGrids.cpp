@@ -8,7 +8,7 @@
 
 UActorFactoryDn2GameGrids::UActorFactoryDn2GameGrids() : Super()
 {
-	DisplayName = FText::FromString("Game Grid");
+	DisplayName = FText::FromString("Game Grid Data");
 }
 
 bool UActorFactoryDn2GameGrids::CanCreateActorFrom(const FAssetData& AssetData, FText& OutErrorMsg)
@@ -75,6 +75,7 @@ void UActorFactoryDn2GameGrids::PostCreateBlueprint(UObject* Asset, AActor* CDO)
 	if (GDataAsset && GridActor)
 	{
 		GridActor->MapData = GDataAsset;
+		GDataAsset->OnChanged.AddUObject(GridActor, &AGridActorBase::OnGridMapDataChanged);
 	}
 	
 	//Super::PostCreateBlueprint(Asset, CDO);

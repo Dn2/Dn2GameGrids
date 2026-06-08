@@ -1,9 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+
+
 #include "GridActorBase.h"
 #include "TextureResource.h"
-
+#if WITH_EDITOR
+#include "Engine/AssetManager.h"
+#endif
 class UProceduralMeshComponent;
 
 // Sets default values
@@ -51,7 +55,30 @@ AGridActorBase::AGridActorBase() : Super()
 	if (GridExtents.Y < 2)
 	{
 		GridExtents.Y = DefaultGridExtents.Y;
-	}	
+	}
+	
+	if (MapData)
+	{
+		MapData->BindOnChanged(this);
+	}
+}
+
+void AGridActorBase::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+#if WITH_EDITOR
+	/*if (MapData && !MapData->OnChanged.IsBoundToObject(this))
+	{
+		//MapData->OnChanged.AddUObject(this, &AGridActorBase::OnGridMapDataChanged);
+		UAssetManager &AssetManager = UAssetManager::Get();
+		UGridMapData* GMD = AssetManager.GetPrimaryAssetObject<UGridMapData>(MapData->GetPrimaryAssetId());
+		if (GMD)
+		{
+			GMD->OnChanged.AddUObject(this, &AGridActorBase::OnGridMapDataChanged);
+		}
+	}*/
+#endif
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +92,10 @@ void AGridActorBase::BeginDestroy()
 {
 	Super::BeginDestroy();
 	
+	if (MapData)
+	{
+		MapData->OnChanged.Remove(MapChangedHandle);
+	}
 }
 
 void AGridActorBase::SetBusy(bool bIsBusy)
@@ -205,10 +236,10 @@ FIntPoint AGridActorBase::GetGridExtents() const
 void AGridActorBase::SetGridExtents(FIntPoint Extents)
 {
 	//TODO: this feels messy.
-	/*if (MapData)
+	if (MapData)
 	{
-		GridExtents = MapData->Extents;
-	}*/
+		Extents = MapData->Extents;
+	}
 	
 	
 	if (Extents.X < 2)
