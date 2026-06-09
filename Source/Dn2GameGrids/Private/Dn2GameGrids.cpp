@@ -2,17 +2,8 @@
 
 #include "Dn2GameGrids.h"
 
-#include "AssetToolsModule.h"
-#include "GridMapData.h"
-#include "IAssetTools.h"
-#include "UnrealEdGlobals.h"
-#include "Editor/UnrealEdEngine.h"
-#include "Engine/AssetManager.h"
-#include "Subsystems/AssetEditorSubsystem.h"
-
 
 #define LOCTEXT_NAMESPACE "FDn2GameGridsModule"
-
 
 void FDn2GameGridsModule::StartupModule()
 {

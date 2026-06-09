@@ -57,10 +57,13 @@ AGridActorBase::AGridActorBase() : Super()
 		GridExtents.Y = DefaultGridExtents.Y;
 	}
 	
+#if WITH_EDITOR
 	if (MapData)
 	{
 		MapData->BindOnChanged(this);
 	}
+#endif
+	
 }
 
 void AGridActorBase::OnConstruction(const FTransform& Transform)
