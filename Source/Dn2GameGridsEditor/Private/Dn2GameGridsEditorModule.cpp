@@ -9,8 +9,11 @@
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
-#include "UObject/ObjectSaveContext.h"
 #include "UObject/SavePackage.h"
+#if ENGINE_MAJOR_VERSION == 5
+#include "UObject/ObjectSaveContext.h"
+#endif
+
 
 IMPLEMENT_GAME_MODULE(FDn2GameGridsEditorModule, Dn2GameGridsEditor);
 
@@ -222,10 +225,9 @@ void FDn2GameGridsEditorModule::CreateAndSaveMaterialPackage()
 		
 		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSuccess ? TEXT("True") : TEXT("False"));
 		
-#if ENGINE_MAJOR_VERSION == 4
+#if ENGINE_MAJOR_VERSION == 4 || ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 2
 		auto clicked = FMessageDialog::Open( EAppMsgType::Ok, FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required to start using Dn2GameGrids. \n \n You can manually restart the editor on your own."),nullptr);
-#endif
-#if ENGINE_MAJOR_VERSION == 5
+#else
 		auto clicked = FMessageDialog::Open( EAppMsgType::Ok, FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required to start using Dn2GameGrids. \n \n You can manually restart the editor on your own."),FText::FromString("Editor Restart"));
 #endif
 		if (clicked == EAppReturnType::Ok)
