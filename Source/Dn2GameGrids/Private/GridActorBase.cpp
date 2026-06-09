@@ -5,10 +5,9 @@
 
 #include "GridActorBase.h"
 #include "TextureResource.h"
-#if WITH_EDITOR
-#include "Engine/AssetManager.h"
-#endif
-class UProceduralMeshComponent;
+#include "ProceduralMeshComponent.h"
+
+//class UProceduralMeshComponent;
 
 // Sets default values
 AGridActorBase::AGridActorBase() : Super()
@@ -309,10 +308,16 @@ TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 Tes
 	{
 		return PixelData;
 	}
-
+	
 	/* The pixel data in the resulting array is not in the same order as our cell array. so first we reorder them */
+#if ENGINE_MAJOR_VERSION == 4
 	FColor* FormattedImageData = reinterpret_cast<FColor*>(Texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_ONLY));
-
+#endif
+	
+#if ENGINE_MAJOR_VERSION == 5
+	FColor* FormattedImageData = reinterpret_cast<FColor*>(Texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_ONLY));
+#endif
+	
 	/* First we need the pixel count and the image's w & h */
 	int32 PixelCount = Texture->GetSizeX() * Texture->GetSizeY();
 	int32 W = Texture->GetSizeX();
@@ -342,7 +347,14 @@ TArray<FColor> AGridActorBase::ImageToFColorArray(UTexture2D* Texture, int32 Tes
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, colour, FString::Printf(TEXT("Color: %s"), *colour.ToString()));
 	}*/
 
+#if ENGINE_MAJOR_VERSION == 4
 	Texture->PlatformData->Mips[0].BulkData.Unlock();
+#endif
+	
+#if ENGINE_MAJOR_VERSION == 5
+	Texture->GetPlatformData()->Mips[0].BulkData.Unlock();
+#endif
+	
 
 	return PixelData;
 }

@@ -23,5 +23,7 @@ public:
 	
 protected:
 	virtual void PostSpawnActor(UObject* Asset, AActor* NewActor) override;
+#if ENGINE_MAJOR_VERSION == 4
 	virtual void PostCreateBlueprint(UObject* Asset, AActor* CDO) override;
+#endif
 };

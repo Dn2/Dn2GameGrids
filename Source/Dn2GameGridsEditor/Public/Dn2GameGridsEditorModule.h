@@ -12,5 +12,11 @@ public:
 	virtual void PostLoadCallback() override;
 	
 	void CreateAndSaveMaterialPackage();
+#if ENGINE_MAJOR_VERSION == 4
 	void OnGridPackageSaved(const FString& PackageFileName, UObject* Outer);
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+	void OnGridPackageSaved(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext PackageName);
+#endif
+	
 };

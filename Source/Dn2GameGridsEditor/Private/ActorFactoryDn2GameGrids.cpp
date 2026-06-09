@@ -19,7 +19,8 @@ bool UActorFactoryDn2GameGrids::CanCreateActorFrom(const FAssetData& AssetData, 
 		if (GDataAsset && !GDataAsset->MapClass.IsEmpty() || !GDataAsset->MapClass.Equals("None") && GDataAsset->Extents.X > 1 && GDataAsset->Extents.Y > 1 )
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("GetSavedClass is %s"), ( GDataAsset->GetSavedClass() ? TEXT("NOT NULL"): TEXT("NULL") ));
-			return GDataAsset->GetSavedClass();
+			if (GDataAsset->GetSavedClass())
+				return true;
 		}
 	}
 	
@@ -68,6 +69,7 @@ void UActorFactoryDn2GameGrids::PostSpawnActor(UObject* Asset, AActor* NewActor)
 	}
 }
 
+#if ENGINE_MAJOR_VERSION == 4
 void UActorFactoryDn2GameGrids::PostCreateBlueprint(UObject* Asset, AActor* CDO)
 {
 	UGridMapData* GDataAsset = Cast<UGridMapData>(Asset);
@@ -80,3 +82,4 @@ void UActorFactoryDn2GameGrids::PostCreateBlueprint(UObject* Asset, AActor* CDO)
 	
 	//Super::PostCreateBlueprint(Asset, CDO);
 }
+#endif

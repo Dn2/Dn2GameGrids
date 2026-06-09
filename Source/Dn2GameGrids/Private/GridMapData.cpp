@@ -2,8 +2,9 @@
 
 
 #include "GridMapData.h"
+#include "GridActorBase.h"
 
-class ABoxGridActor;
+//class ABoxGridActor;
 
 UGridMapData::UGridMapData()
 {
@@ -41,14 +42,29 @@ void UGridMapData::Serialize(FStructuredArchive::FRecord Record)
 
 UClass* UGridMapData::GetSavedClass() const
 {
+#if ENGINE_MAJOR_VERSION == 4
 	if (UClass* SavedClass = FindObject<UClass>(ANY_PACKAGE, *MapClass, true))
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+	if (UClass* SavedClass = FindFirstObjectSafe<UClass>(*MapClass))
+#endif
 	{
 		return SavedClass;
 	}
 	
+#if ENGINE_MAJOR_VERSION == 4
 	if (UObjectRedirector* RenamedClassRedirector = FindObject<UObjectRedirector>(ANY_PACKAGE, *MapClass, true))
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+	if (UObjectRedirector* RenamedClassRedirector = FindFirstObjectSafe<UObjectRedirector>(*MapClass))
+#endif
 	{
+#if ENGINE_MAJOR_VERSION == 4
 		return CastChecked<UClass>(RenamedClassRedirector);
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+		return RenamedClassRedirector->StaticClass();
+#endif
 	}
 	
 #if WITH_EDITOR

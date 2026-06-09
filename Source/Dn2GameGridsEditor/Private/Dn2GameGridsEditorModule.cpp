@@ -9,6 +9,8 @@
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "UObject/ObjectSaveContext.h"
+#include "UObject/SavePackage.h"
 
 IMPLEMENT_GAME_MODULE(FDn2GameGridsEditorModule, Dn2GameGridsEditor);
 
@@ -196,31 +198,51 @@ void FDn2GameGridsEditorModule::CreateAndSaveMaterialPackage()
 	
 	if(GenGridMat && Package)
 	{
+#if ENGINE_MAJOR_VERSION == 4
 		Package->PackageSavedEvent.AddRaw(this, &FDn2GameGridsEditorModule::OnGridPackageSaved);
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+		Package->PackageSavedWithContextEvent.AddRaw(this, &FDn2GameGridsEditorModule::OnGridPackageSaved);
+#endif
 		
 		FAssetRegistryModule::AssetCreated(GenGridMat);
 		Package->SetDirtyFlag(true);
 		FString FilePath = FString::Printf(TEXT("%s%s%s"), *AssetPath, *FString("M_BoxGridDebug"), *FPackageName::GetAssetPackageExtension());
 		UMaterialEditingLibrary::RecompileMaterial(GenGridMat);
+		
+#if ENGINE_MAJOR_VERSION == 4
 		bool bSuccess = UPackage::SavePackage(Package, GenGridMat, EObjectFlags::RF_Public | EObjectFlags::RF_Standalone, *FilePath);
-
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+		FSavePackageArgs Args;
+		Args.SaveFlags = EObjectFlags::RF_Public | EObjectFlags::RF_Standalone;
+		bool bSuccess = UPackage::SavePackage(Package, GenGridMat, *FilePath, Args);
+#endif
+		
+		
 		UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), bSuccess ? TEXT("True") : TEXT("False"));
 		
+#if ENGINE_MAJOR_VERSION == 4
 		auto clicked = FMessageDialog::Open( EAppMsgType::Ok, FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required to start using Dn2GameGrids. \n \n You can manually restart the editor on your own."),nullptr);
-		/*UEditorDialogLibrary::ShowMessage(
-			FText::FromString("Editor Restart Needed"),
-			FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required To start using Dn2GameGrids. Click No to manually restart editor on your own."),
-			EAppMsgType::Ok);*/
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+		auto clicked = FMessageDialog::Open( EAppMsgType::Ok, FText::FromString("Material M_BoxGridDebug was created in plugin dir. A one time editor restart is required to start using Dn2GameGrids. \n \n You can manually restart the editor on your own."),FText::FromString("Editor Restart"));
+#endif
 		if (clicked == EAppReturnType::Ok)
 		{
 			FUnrealEdMisc::Get().RestartEditor(true);
 		}
-		
+
 	}
 }
 
 
+#if ENGINE_MAJOR_VERSION == 4
 void FDn2GameGridsEditorModule::OnGridPackageSaved(const FString& PackageFileName, UObject* Outer)
+#endif
+#if ENGINE_MAJOR_VERSION == 5
+void FDn2GameGridsEditorModule::OnGridPackageSaved(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext PackageName)
+#endif
 {
 	UE_LOG(LogTemp, Warning, TEXT("Saved Package: %s"), *PackageFileName);
 	//FModuleManager::Get().LoadModuleChecked(FName("Dn2GameGrids"));
