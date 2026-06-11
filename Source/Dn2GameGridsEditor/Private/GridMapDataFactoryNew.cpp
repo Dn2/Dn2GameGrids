@@ -21,6 +21,11 @@ UGridMapDataFactoryNew::UGridMapDataFactoryNew(const FObjectInitializer& ObjectI
 
 	// Enter name-edit-mode after the asset has been created.
 	bEditAfterNew = true;
+	
+	/*bText = true;
+	bEditorImport = true;
+	Formats.Add(FString("json;RPG Map 2"));
+	Formats.Add(FString("dgm;RPG Map 2"));*/
 }
 
 // Called by the engine when a new instance of the asset
@@ -38,6 +43,99 @@ bool UGridMapDataFactoryNew::ShouldShowInNewMenu() const
 {
 	return true;
 }
+
+/*UObject* UGridMapDataFactoryNew::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags,
+	const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
+{
+	UGridMapData* GMD = nullptr;
+	FString TextString;
+	FJsonObjectWrapper Obj;
+	
+	
+	UE_LOG(LogTemp, Warning, TEXT("Imported Filename: %s"), *Filename);
+	if (FFileHelper::LoadFileToString(TextString, *Filename))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Imported: %s"), *TextString);
+		
+		GMD = NewObject<UGridMapData>(InParent, InClass, InName, Flags);
+		Obj.JsonObjectFromString(TextString);
+		
+		//extents
+		int32 h = 0;
+		int32 w = 0;
+		if (Obj.JsonObject->TryGetNumberField("h",h) && Obj.JsonObject->TryGetNumberField("w",w) && GMD)
+		{
+			GMD->Extents = FIntPoint(w, h);
+		}
+		
+		
+		//collisions
+		const TArray<TSharedPtr<FJsonValue>>* Values;
+		if (Obj.JsonObject->TryGetArrayField("collisions", Values))
+		{
+			for (TSharedPtr<FJsonValue> Value : *Values)
+			{
+				TArray<FString> StringArray;
+				Value->AsString().ParseIntoArray(StringArray, TEXT("\""), true);
+				if (StringArray.IsValidIndex(0) && GMD)
+				{
+					GMD->BlockedCells.Add(FCString::Atoi(*StringArray[0]));
+				}
+			}
+		}
+	}
+	GMD->Extents = FIntPoint(16, 16);
+	bOutOperationCanceled = false;
+	return GMD;
+	//return Super::FactoryCreateFile(InClass, InParent, InName, Flags, Filename, Parms, Warn, bOutOperationCanceled);
+}*/
+
+/*UObject* UGridMapDataFactoryNew::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags,
+	UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
+{
+	UGridMapData* GMD = nullptr;
+	//FString TextString;
+
+	
+	
+	//UE_LOG(LogTemp, Warning, TEXT("Imported Filename: %s"), *Filename);
+	if (Buffer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Imported: %s"), Buffer);
+		FJsonObjectWrapper Obj;
+		GMD = NewObject<UGridMapData>(InParent, InClass, InName, Flags);
+		Obj.JsonObjectFromString(Buffer);
+		
+		//extents
+		int32 h = 0;
+		int32 w = 0;
+		if (Obj.JsonObject->TryGetNumberField("h",h) && Obj.JsonObject->TryGetNumberField("w",w) && GMD)
+		{
+			GMD->Extents = FIntPoint(w, h);
+		}
+		
+		
+		//collisions
+		const TArray<TSharedPtr<FJsonValue>>* Values;
+		if (Obj.JsonObject->TryGetArrayField("collisions", Values))
+		{
+			for (TSharedPtr<FJsonValue> Value : *Values)
+			{
+				TArray<FString> StringArray;
+				Value->AsString().ParseIntoArray(StringArray, TEXT("\""), true);
+				if (StringArray.IsValidIndex(0) && GMD)
+				{
+					GMD->BlockedCells.Add(FCString::Atoi(*StringArray[0]));
+				}
+			}
+		}
+	}
+	//GMD->Extents = FIntPoint(16, 16);
+	//bOutOperationCanceled = false;
+	return GMD;
+	
+	//return Super::FactoryCreateText(InClass, InParent, InName, Flags, Context, Type, Buffer, BufferEnd, Warn);
+}*/
 
 FText UGridMapDataFactoryNew::GetDisplayName() const
 {
