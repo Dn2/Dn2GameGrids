@@ -2,8 +2,6 @@
 
 
 #include "GridMapDataFactory.h"
-
-#include "GameplayTagsManager.h"
 #include "GridMapData.h"
 #include  "JsonUtilities/Public/JsonUtilities.h"
 
@@ -63,7 +61,7 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 					}
 					
 					//layers
-					const TArray<TSharedPtr<FJsonValue>>* Layers;
+					/*const TArray<TSharedPtr<FJsonValue>>* Layers;
 					if (Levels[0]->AsObject()->TryGetArrayField("layers",Layers))
 					{
 						// for every layer
@@ -80,28 +78,26 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 								const TSharedPtr<FJsonObject>* layerData;
 								if (layerValue->AsObject()->TryGetObjectField("layerData", layerData))
 								{
-									//FGameplayTag LayerTag = FGameplayTag::GetSingleTagContainer();
-									//UGameplayTagsManager::
 									for (const TTuple<FString, TSharedPtr<FJsonValue>> IndexedCell : layerData->Get()->Values)
 									{
 										// KeyValuePair.Key
 										// KeyValuePair.Value
-										//if ()
+										
 										int cellIndex = FCString::Atoi(*IndexedCell.Key);
-										FGameplayTagContainer TagContainer;
-										TagContainer.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(*LayerName,false));
-										GMD->CellTags.Add(cellIndex, TagContainer);
+										
+										UE_DEFINE_GAMEPLAY_TAG_STATIC(TAG_Imported, *LayerName)
+										
+										//if (GMD->CellTags[cellIndex].IsValid() && !GMD->CellTags[cellIndex].HasTag(LayerTag))
+										//{
+											GMD->CellTags[cellIndex].AddTag(TAG_Imported);
+										//}
 									}
 								}
 							}
 							
 							//check every index value for a valid game tag
 						}
-					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Imported: Could not get level 0 array"));
-					}
+					}*/
 					//gametags
 					
 				}
