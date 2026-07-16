@@ -3,6 +3,8 @@
 
 #include "GridMapData.h"
 #include "GridActorBase.h"
+#include "UObject/ObjectRedirector.h"
+
 
 //class ABoxGridActor;
 
