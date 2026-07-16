@@ -101,7 +101,7 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 					//gametags
 					
 				}
-				
+				GMD->MapClass = "BoxGridActor";
 			}
 			else
 			{
@@ -109,6 +109,7 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 				return nullptr;
 			}
 		}
+		return GMD;
 	}
 	
 	// if json;RPG Map 2. should check for valid map header
