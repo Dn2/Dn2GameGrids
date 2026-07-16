@@ -41,17 +41,17 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 			
 			
 			// contains any levels?
-			if (Obj.JsonObject->HasTypedField<EJson::Array>("levels") && Obj.JsonObject->GetArrayField("levels").Num() > 0 )
+			if (Obj.JsonObject->HasTypedField<EJson::Array>(TEXT("levels")) && Obj.JsonObject->GetArrayField(TEXT("levels")).Num() > 0 )
 			{
-				TArray<TSharedPtr<FJsonValue>> Levels = Obj.JsonObject->GetArrayField("levels");
+				TArray<TSharedPtr<FJsonValue>> Levels = Obj.JsonObject->GetArrayField(TEXT("levels"));
 
 				const TArray<TSharedPtr<FJsonValue>>* Blocked;
-				if (Levels[0]->AsObject()->TryGetArrayField("blockedCells",Blocked))
+				if (Levels[0]->AsObject()->TryGetArrayField(TEXT("blockedCells"),Blocked))
 				{
 					//extents
 					int32 h = 0;
 					int32 w = 0;
-					if (Levels[0]->AsObject()->TryGetNumberField("h",h) && Levels[0]->AsObject()->TryGetNumberField("w",w) && GMD)
+					if (Levels[0]->AsObject()->TryGetNumberField(TEXT("h"),h) && Levels[0]->AsObject()->TryGetNumberField(TEXT("w"),w) && GMD)
 					{
 						GMD->Extents = FIntPoint(w, h);
 					}
@@ -129,7 +129,7 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 			//extents
 			int32 h = 0;
 			int32 w = 0;
-			if (Obj.JsonObject->TryGetNumberField("h",h) && Obj.JsonObject->TryGetNumberField("w",w) && GMD)
+			if (Obj.JsonObject->TryGetNumberField(TEXT("h"),h) && Obj.JsonObject->TryGetNumberField(TEXT("w"),w) && GMD)
 			{
 				GMD->Extents = FIntPoint(w, h);
 			}
@@ -137,7 +137,7 @@ UObject* UGridMapDataFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 		
 			//collisions
 			const TArray<TSharedPtr<FJsonValue>>* Values;
-			if (Obj.JsonObject->TryGetArrayField("collisions", Values))
+			if (Obj.JsonObject->TryGetArrayField(TEXT("collisions"), Values))
 			{
 				for (TSharedPtr<FJsonValue> Value : *Values)
 				{
