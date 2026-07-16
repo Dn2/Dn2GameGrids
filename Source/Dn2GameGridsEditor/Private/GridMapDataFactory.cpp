@@ -3,7 +3,7 @@
 
 #include "GridMapDataFactory.h"
 #include "GridMapData.h"
-#include  "JsonUtilities/Public/JsonUtilities.h"
+#include "JsonUtilities.h"
 
 UGridMapDataFactory::UGridMapDataFactory(const FObjectInitializer& ObjectInitializer)
 {
